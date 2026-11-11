@@ -15,7 +15,9 @@ jobs:
       - run: bun run lint
       - run: bun run typecheck
       - run: bun run test
-      - run: bunx playwright install --with-deps chromium
+      # The runner image already has Chromium's shared libraries. --with-deps
+      # also apt-installs extra fonts, and that fails when Ubuntu archive DNS blips.
+      - run: bunx playwright install chromium
       - run: bun run test:e2e:production
       - name: Build against the deterministic gRPC fixture
         env:

@@ -73,6 +73,10 @@ The serialized snapshot is cached with the forecast; this also
 contains the timestamps DB records internally within a valid cache boundary.
 The browser hydrates one app-scoped client, preserving live-query state when
 Next's Activity hides a city view and restores it on browser Back/Forward.
+Completed city visits are also reused on link navigation for five minutes via
+`experimental.staleTimes.dynamic`. Next otherwise defaults request-rendered
+pages to zero seconds, even when their backend data is cached. Prefetched
+forecast entries retain their existing one-minute `cacheLife.stale` window.
 No process-wide collection state is shared between server renders.
 
 All protobuf code lives under `src/server/gen`. Only plain, validated weather
@@ -87,10 +91,17 @@ forcing a new IPMA request. Locations revalidate daily and descriptions use the
 Tags identify each city forecast and the location catalogue for future
 invalidation. No public cache invalidation endpoint is exposed.
 
+On Workers, `experimental.disableResumeDataCacheCompression` avoids a workerd
+`RangeError` when Next restores a compressed Resume Data Cache using
+`inflateSync` with an unsupported output limit. Without it, a successful static
+shell can leave the forecast stuck on “Looking at the skies.” Build and deploy
+together so the persisted resume state and runtime use the same format.
+
 All requested framework features remain enabled. The two deliberate dependency
 choices are TanStack DB's current RC for native SSR support, and the community
 StyleX SWC integration to retain the native Next compiler pipeline. Astryx is
-currently beta. No experimental Next flags are needed.
+currently beta. The experimental Next options above handle Workers resume
+compatibility and completed-visit reuse.
 
 ## Generate the client
 
@@ -119,6 +130,14 @@ bun run test:e2e:production
 bun run build
 bun run check:client
 ```
+
+`bun run test:e2e:worker` additionally builds the Cloudflare bundle and runs
+desktop/mobile Chromium against Wrangler on **8788**. It exercises the actual
+Workers runtime, including initial forecast streaming and revisiting cities
+after a minute with forecast/page requests blocked. These integration tests use
+the gateway configured in `wrangler.toml`; the build also needs a reachable
+backend (`IPMA_GRPC_URL`, as with `build:cf`). They are separate from the
+self-contained gRPC fixture suite below.
 
 Vitest covers protobuf-to-DTO mapping, zero and absent values, civil dates,
 weather codes, API validation/errors, and DB hydration/request isolation.

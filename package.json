@@ -19,6 +19,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:production": "E2E_PRODUCTION=1 playwright test",
+    "test:e2e:worker": "bun run build:cf && playwright test --config playwright.worker.config.ts",
     "proto:generate": "bun scripts/generate-proto.ts",
     "check:client": "bun scripts/check-client-bundle.ts",
     "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs"

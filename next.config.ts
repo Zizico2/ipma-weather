@@ -13,6 +13,12 @@ const config: NextConfig = {
   serverExternalPackages: ['@connectrpc/connect-node'],
   turbopack: { root: process.cwd() },
   experimental: {
+    // City routes render at request time. Retain completed visits for the same
+    // five minutes as the forecast cache instead of discarding them on a link click.
+    staleTimes: { dynamic: 300 },
+    // workerd rejects the output limit used by Next's synchronous RDC inflate.
+    // Keep build-time and runtime resume-state serialization in the same format.
+    disableResumeDataCacheCompression: true,
     exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === '1',
   },
 };

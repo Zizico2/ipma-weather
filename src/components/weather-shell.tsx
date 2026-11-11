@@ -25,7 +25,8 @@ export function WeatherShell({
           label="Tempo"
           heading={
             <TopNavHeading
-              // `/` is a redirect, so this stays a plain link the browser can follow.
+              // NextLink caches the redirect destination; a plain link reads the
+              // latest-city cookie on every click, even after switching cities.
               as="a"
               heading="tempo."
               headingHref="/"

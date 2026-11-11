@@ -144,6 +144,42 @@ test('opens the latest city from / and /weather, otherwise Lisbon', async ({
   await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
 });
 
+test('home link resolves the current city cookie on every click', async ({
+  page,
+  baseURL,
+}) => {
+  await page.goto('/weather/1110600');
+  await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
+  await expect.poll(() => latestCity(page)).toBe('1110600');
+
+  const homeRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/')
+      homeRequests.push(request.url());
+  });
+
+  const home = page.getByRole('banner').getByRole('link', { name: 'tempo.' });
+  await home.hover();
+  await home.focus();
+  await page.waitForLoadState('networkidle');
+  expect(homeRequests).toEqual([]);
+
+  // Change the cookie after the link is visible, then repeat to catch a cached
+  // redirect destination from the first home click.
+  for (const [id, city] of [
+    ['1131200', 'Porto'],
+    ['1080500', 'Faro'],
+  ]) {
+    await page
+      .context()
+      .addCookies([{ name: 'latest-location', value: id, url: baseURL }]);
+    await home.click();
+    await expect(page).toHaveURL(`/weather/${id}`);
+    await expect(page.getByRole('heading', { name: `${city},` })).toBeVisible();
+    await expect.poll(() => latestCity(page)).toBe(id);
+  }
+});
+
 test('redirects /weather without JavaScript', async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   await context.addCookies([

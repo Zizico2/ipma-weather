@@ -23,7 +23,6 @@ export default defineConfig({
       env: {
         IPMA_GRPC_URL: 'http://127.0.0.1:50061',
         NEXT_DIST_DIR: '.next-e2e',
-        IPMA_PREFERENCES_DB: ':memory:',
       },
       reuseExistingServer: false,
       timeout: 120_000,

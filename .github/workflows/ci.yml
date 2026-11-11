@@ -24,7 +24,7 @@ jobs:
           node --import tsx tests/fixtures/grpc-server.ts &
           fixture_pid=$!
           trap 'kill "$fixture_pid"' EXIT
-          node --input-type=module -e 'import {connect} from "node:net"; for (let i=0;i<50;i++) { if (await new Promise(r=>{const s=connect(50061,"127.0.0.1");s.on("connect",()=>{s.destroy();r(true)});s.on("error",()=>r(false))})) process.exit(0); await new Promise(r=>setTimeout(r,100)); } process.exit(1)'
+          node --input-type=module -e 'import {connect} from "net"; for (let i=0;i<50;i++) { if (await new Promise(r=>{const s=connect(50061,"127.0.0.1");s.on("connect",()=>{s.destroy();r(true)});s.on("error",()=>r(false))})) process.exit(0); await new Promise(r=>setTimeout(r,100)); } process.exit(1)'
           bun run build
           bun run check:client
       - uses: actions/upload-artifact@v4

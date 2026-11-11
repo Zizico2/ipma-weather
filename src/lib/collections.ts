@@ -1,7 +1,6 @@
 import { collectionOptions, DbClient } from '@tanstack/db';
 import { QueryClient } from '@tanstack/query-core';
 import { queryCollectionOptions } from '@tanstack/query-db-collection';
-import type { SavedPlacesLoader } from './saved-places';
 import type { Forecast, WeatherLocation } from './weather';
 
 export interface WeatherLoader {
@@ -39,11 +38,8 @@ export function forecastCollection(id: number) {
   );
 }
 
-export function createWeatherDb(
-  loader: WeatherLoader,
-  savedPlaces?: SavedPlacesLoader,
-) {
+export function createWeatherDb(loader: WeatherLoader) {
   const queryClient = new QueryClient();
-  const db = new DbClient({ queryClient, loader, savedPlaces });
+  const db = new DbClient({ queryClient, loader });
   return { db, queryClient };
 }

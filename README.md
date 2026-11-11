@@ -1,7 +1,7 @@
 # Tempo · IPMA weather
 
 A small weather app for Portugal, in its own repository. Search IPMA locations,
-explore the five-day forecast, select a day, switch °C/°F, save places, and refresh. Missing
+explore the five-day forecast, select a day, switch °C/°F, and refresh. Missing
 measurements stay missing; daily maximums are labelled as forecasts, not current
 observations. All weather data comes from the backend.
 
@@ -72,24 +72,6 @@ forcing a new IPMA request. Locations revalidate daily and descriptions use the
 Tags identify each city forecast and the location catalogue for future
 invalidation. No public cache invalidation endpoint is exposed.
 
-### Optimistic saved places
-
-Weather is read-only. The sample's writes are personal saved places, stored by
-Hono in SQLite (`.data/weather.sqlite`, configurable with `IPMA_PREFERENCES_DB`).
-Use a persistent writable volume when hosting this app. A random HttpOnly,
-SameSite browser cookie scopes each visitor's list; it is not an account or
-cross-device sync. Personal endpoints use `private, no-store`, with Hono CSRF
-checks on mutations. Preferences never enter the public weather cache.
-
-`savedPlacesCollection` uses TanStack DB `onInsert` and `onDelete` handlers.
-Calling `collection.insert()` or `.delete()` changes live-query results
-immediately. The handler writes through Hono and applies confirmed server data
-with `writeInsert` / `writeDelete` before settling. Rejected writes trigger
-TanStack DB's automatic rollback and a visible message. The UI awaits
-`transaction.when('settled')` for acknowledgement and blocks overlapping clicks
-on the same place; it keeps no separate React copy of the saved list. Day and
-unit selection remain immediate local view state.
-
 All requested framework features remain enabled. The two deliberate dependency
 choices are TanStack DB's current RC for native SSR support, and the community
 StyleX SWC integration to retain the native Next compiler pipeline. Astryx is
@@ -124,17 +106,11 @@ bun run check:client
 
 Vitest covers protobuf-to-DTO mapping, zero and absent values, civil dates,
 weather codes, API validation/errors, and DB hydration/request isolation.
-It also verifies optimistic insert/delete rollback, SQLite persistence, visitor
-isolation, private caching, and mutation validation.
 Playwright runs desktop and mobile Chromium against an actual generated-schema
 HTTP/2 gRPC fixture. It covers streamed server HTML with JS disabled, hydration,
 city navigation, units, day selection, refresh failure with retained data,
 empty/missing data, backend failure, and unknown locations. With JS disabled,
 late Suspense HTML is present but React's reveal script cannot run.
-
-Saved-place tests hold HTTP acknowledgements open to prove inserts and deletes
-appear before the server responds, then verify persistence after reload and
-rollback of both mutation types on 503 responses.
 
 E2E runs its own gRPC server on **50061** and Next on **3001**, with a separate
 `.next-e2e` build directory. The fixture is test-only; the app never falls back

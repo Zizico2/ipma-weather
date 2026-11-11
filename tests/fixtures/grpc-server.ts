@@ -1,6 +1,6 @@
-import { createServer } from 'node:http2';
 import { Code, ConnectError } from '@connectrpc/connect';
 import { connectNodeAdapter } from '@connectrpc/connect-node';
+import { createServer } from 'http2';
 import { ProxyService } from '../../src/server/gen/ipma/proxy/v1/proxy_pb';
 import { fixtureForecast, locations } from './data';
 

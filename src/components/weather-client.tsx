@@ -17,7 +17,6 @@ import {
   Droplets,
   MapPin,
   RefreshCw,
-  Star,
   Wind,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -27,9 +26,7 @@ import {
   forecastCollection,
   locationsCollection,
 } from '../lib/collections';
-import { httpLoader, savedPlacesHttpLoader } from '../lib/http';
-import { savedPlacesCollection } from '../lib/saved-places-collection';
-import type { WeatherLocation } from '../lib/weather';
+import { httpLoader } from '../lib/http';
 import { dayLabel, temperature } from '../lib/weather';
 import { WeatherIcon } from './weather-icon';
 
@@ -40,9 +37,7 @@ export function WeatherClient({
   locationId: number;
   state: DehydratedDbState;
 }) {
-  const [scope] = useState(() =>
-    createWeatherDb(httpLoader, savedPlacesHttpLoader),
-  );
+  const [scope] = useState(() => createWeatherDb(httpLoader));
   const cleanup = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     clearTimeout(cleanup.current);
@@ -133,7 +128,6 @@ function WeatherDashboard({ locationId }: { locationId: number }) {
           type="search"
           hasClear
         />
-        <SavedPlaces locationId={locationId} locations={locations} />
         <p {...stylex.props(styles.listLabel)}>
           {search ? `${filtered.length} PLACES FOUND` : 'EXPLORE LOCATIONS'}
         </p>
@@ -360,108 +354,6 @@ function WeatherDashboard({ locationId }: { locationId: number }) {
   );
 }
 
-function SavedPlaces({
-  locationId,
-  locations,
-}: {
-  locationId: number;
-  locations: WeatherLocation[];
-}) {
-  const db = useDbClient();
-  const {
-    data: savedPlaces,
-    isReady,
-    isLoadingError,
-  } = useLiveQuery({
-    query: (q) => q.from({ place: savedPlacesCollection }),
-  });
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState('');
-  const saved = savedPlaces.some((place) => place.id === locationId);
-  async function toggle() {
-    setError('');
-    setPending(true);
-    try {
-      const collection = db.collection(savedPlacesCollection);
-      // These operations immediately update every live query. TanStack owns
-      // the optimistic layer, confirmation and rollback; no mirrored React list.
-      const transaction = saved
-        ? collection.delete(locationId)
-        : collection.insert({ id: locationId });
-      await transaction.when('settled');
-    } catch {
-      setError('Couldn’t save your places. The change was rolled back.');
-    } finally {
-      setPending(false);
-    }
-  }
-  async function retry() {
-    setError('');
-    try {
-      await db
-        .collection(savedPlacesCollection)
-        .utils.refetch({ throwOnError: true });
-    } catch {
-      setError('Saved places are unavailable. Please try again.');
-    }
-  }
-  return (
-    <div {...stylex.props(styles.savedPlaces)}>
-      <Button
-        label={saved ? 'Remove saved place' : 'Save this place'}
-        aria-pressed={saved}
-        variant="ghost"
-        size="sm"
-        icon={
-          <Star
-            size={15}
-            fill={saved ? 'currentColor' : 'none'}
-            aria-hidden="true"
-          />
-        }
-        onClick={() => void toggle()}
-        isDisabled={!isReady || pending}
-      >
-        {saved ? 'Saved' : 'Save place'}
-      </Button>
-      {pending && (
-        <p {...stylex.props(styles.muted)} role="status">
-          Saving…
-        </p>
-      )}
-      {savedPlaces.length > 0 && (
-        <nav aria-label="Saved places" {...stylex.props(styles.savedList)}>
-          {savedPlaces.map((place) => {
-            const city = locations.find((location) => location.id === place.id);
-            return city ? (
-              <Link
-                key={place.id}
-                href={`/weather/${place.id}`}
-                aria-label={`Saved place: ${city.name}`}
-                {...stylex.props(styles.savedLink)}
-              >
-                <Star size={12} fill="currentColor" aria-hidden="true" />
-                {city.name}
-              </Link>
-            ) : null;
-          })}
-        </nav>
-      )}
-      {isLoadingError && (
-        <Button
-          label="Retry saved places"
-          size="sm"
-          variant="ghost"
-          onClick={() => void retry()}
-        />
-      )}
-      <div role="status" aria-live="polite">
-        {error && <p {...stylex.props(styles.savedError)}>{error}</p>}
-      </div>
-    </div>
-  );
-}
-
 function formatTime(value: string) {
   return new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
@@ -474,20 +366,6 @@ function formatTime(value: string) {
 }
 
 const styles = stylex.create({
-  savedPlaces: { marginTop: 12 },
-  savedList: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 },
-  savedLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    fontSize: 11,
-    backgroundColor: '#e4ebd6',
-    color: '#344f33',
-    padding: '6px 10px',
-    borderRadius: 16,
-    textDecoration: 'none',
-  },
-  savedError: { color: '#7c3f28', fontSize: 11, lineHeight: 1.6, marginTop: 8 },
   layout: {
     display: 'grid',
     gridTemplateColumns: {

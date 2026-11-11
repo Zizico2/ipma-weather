@@ -48,7 +48,7 @@ forecast cache can still take time to fill before navigation.
 | Next caching | Cache Components, Partial Prefetching, `use cache`, `cacheLife`, `cacheTag`           |
 | Styling      | StyleX **0.19.1**, compiled with the SWC community integration and PostCSS extraction |
 | Components   | Astryx **0.7.13**, prebuilt component CSS, neutral theme, Button and TextInput        |
-| Server API   | Hono in a Next route handler, Node runtime                                            |
+| Server API   | Hono RPC in a Next route handler, Node runtime                                        |
 | Backend      | Generated Protobuf-ES descriptors + Connect's native HTTP/2 gRPC transport            |
 | Client data  | TanStack DB **1.0.0-rc.1.4**, Query collection adapter, live queries                  |
 | Tools        | Bun lockfile, Biome, TypeScript, Vitest, Playwright                                   |
@@ -62,9 +62,9 @@ Hono /api → same cached backend loaders → gRPC
 ```
 
 Server Components call shared loaders directly, avoiding an HTTP request to
-their own Hono endpoint. Browser collection queries use `/api/locations` and
-`/api/forecasts/:locationId`. The API validates IDs and returns 400, 404 or a
-sanitized 503 as appropriate.
+their own Hono endpoint. Browser collection queries use the typed Hono client
+in `src/sdk`, which calls `/api/locations` and `/api/forecasts/:locationId`.
+The API validates IDs and returns 400, 404 or a sanitized 503 as appropriate.
 
 The server allocates a fresh `DbClient` and `QueryClient` for each snapshot
 computation, preloads the ordered forecast live query, dehydrates its result
@@ -79,10 +79,11 @@ pages to zero seconds, even when their backend data is cached. Prefetched
 forecast entries retain their existing one-minute `cacheLife.stale` window.
 No process-wide collection state is shared between server renders.
 
-All protobuf code lives under `src/server/gen`. Only plain, validated weather
-DTOs cross the RSC boundary. `server-only` protects the gRPC entry point;
-`bun run check:client` checks production browser assets for the gRPC runtime
-and schema markers.
+All protobuf code lives under `src/server/gen`. Only plain weather DTOs cross
+the RSC boundary. The browser client infers those DTOs from the Hono routes.
+`server-only` protects the gRPC entry point; `bun run check:client` checks
+production browser assets for the gRPC runtime, schema markers, and server
+route strings.
 
 Forecasts revalidate after 5 minutes and expire after 30 minutes. Next can serve
 stale data while revalidating; a refresh reads this shared cache, rather than

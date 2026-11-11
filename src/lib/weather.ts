@@ -1,29 +1,25 @@
-import { z } from 'zod';
+export type WeatherLocation = {
+  id: number;
+  name: string;
+  latitude: number | null;
+  longitude: number | null;
+};
 
-export const locationSchema = z.object({
-  id: z.number().int().positive(),
-  name: z.string(),
-  latitude: z.number().nullable(),
-  longitude: z.number().nullable(),
-});
-export type WeatherLocation = z.infer<typeof locationSchema>;
-
-export const forecastSchema = z.object({
-  id: z.string(),
-  locationId: z.number().int().positive(),
-  date: z.iso.date(),
-  minimum: z.number().nullable(),
-  maximum: z.number().nullable(),
-  rain: z.number().nullable(),
-  windDirection: z.string(),
-  condition: z.string(),
-  weatherCode: z.number().nullable(),
-  fetchedAt: z.iso.datetime().nullable(),
-  updatedAt: z.iso.datetime().nullable(),
-  attribution: z.string(),
-  sourceUrl: z.string(),
-});
-export type Forecast = z.infer<typeof forecastSchema>;
+export type Forecast = {
+  id: string;
+  locationId: number;
+  date: string;
+  minimum: number | null;
+  maximum: number | null;
+  rain: number | null;
+  windDirection: string;
+  condition: string;
+  weatherCode: number | null;
+  fetchedAt: string | null;
+  updatedAt: string | null;
+  attribution: string;
+  sourceUrl: string;
+};
 
 export const DEFAULT_LOCATION_ID = 1110600;
 

@@ -10,14 +10,14 @@ export interface WeatherService {
 export function createWeatherApi(service: WeatherService) {
   return new Hono()
     .basePath('/api')
-    .get('/locations', async (c) => c.json(await service.getLocations()))
+    .get('/locations', async (c) => c.json(await service.getLocations(), 200))
     .get('/forecasts/:id', async (c) => {
       const id = parseLocationId(c.req.param('id'));
       if (id === null) return c.json({ error: 'Invalid location ID.' }, 400);
       const locations = await service.getLocations();
       if (!locations.some((location) => location.id === id))
         return c.json({ error: 'Location not found.' }, 404);
-      return c.json(await service.getForecast(id));
+      return c.json(await service.getForecast(id), 200);
     })
     .notFound((c) => c.json({ error: 'API route not found.' }, 404))
     .onError((error, c) => {
@@ -28,3 +28,5 @@ export function createWeatherApi(service: WeatherService) {
       );
     });
 }
+
+export type WeatherApi = ReturnType<typeof createWeatherApi>;

@@ -9,11 +9,11 @@ async function check(directory: string): Promise<number> {
     else if (entry.name.endsWith('.js')) {
       const source = await readFile(path, 'utf8');
       if (
-        /ipma\.proxy\.v1|createGrpcTransport|@connectrpc\/connect-node|node:http2|GetWeatherForecastRequest/.test(
+        /ipma\.proxy\.v1|createGrpcTransport|@connectrpc\/connect-node|node:http2|GetWeatherForecastRequest|Invalid location ID|Weather backend request failed/.test(
           source,
         )
       ) {
-        throw new Error(`Server gRPC code found in browser asset: ${path}`);
+        throw new Error(`Server-only code found in browser asset: ${path}`);
       }
       count++;
     }
@@ -22,5 +22,5 @@ async function check(directory: string): Promise<number> {
 }
 
 console.log(
-  `Checked ${await check('.next/static')} browser JavaScript assets: no gRPC runtime or schemas.`,
+  `Checked ${await check('.next/static')} browser JavaScript assets: no gRPC runtime or server routes.`,
 );

@@ -1,4 +1,4 @@
-import { handle } from 'hono/vercel';
+import { handle } from '@hono/vercel';
 import { createWeatherApi } from '../../../server/api';
 import { getForecast, getLocations } from '../../../server/weather';
 

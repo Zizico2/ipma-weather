@@ -5,7 +5,13 @@ for (const intent of ['hover', 'focus'] as const) {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
     await page.waitForLoadState('networkidle');
-    for (const city of ['Angra do Heroísmo', 'Aveiro', 'Braga', 'Bragança']) {
+    for (const city of [
+      'Angra do Heroísmo',
+      'Aveiro',
+      'Braga',
+      'Bragança',
+      'Castelo Branco',
+    ]) {
       const search = page.getByRole('searchbox', {
         name: 'Search locations',
       });
@@ -29,7 +35,7 @@ test('overlapping navigations and runtime prefetches complete their forecast sta
   request,
 }) => {
   await Promise.all(
-    [3430100, 1010500, 1030300, 1040200].map(async (id) => {
+    [3430100, 1010500, 1030300, 1040200, 1050200].map(async (id) => {
       // The router state captured from a real Next 16.4 city-picker navigation.
       // The bit fields and RSC headers are part of the pinned Next wire protocol.
       const tree = [

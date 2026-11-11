@@ -35,10 +35,10 @@ index 7420316008e9651c5a1e41d2edcc3d00b8d023f8..2e71d314505af2c8cfeaa18d0eb99853
              inlineLoadManifest(updater, buildOpts),
 diff --git a/dist/cli/build/patches/plugins/cache-components.js b/dist/cli/build/patches/plugins/cache-components.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..766c9c149d01a2c3a0d527a1884168ccd2fd4041
+index 0000000000000000000000000000000000000000..deb49dc82c73338c701f9a4fc2b5f2fb900969cd
 --- /dev/null
 +++ b/dist/cli/build/patches/plugins/cache-components.js
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,111 @@
 +import path from "node:path";
 +import { compareSemver } from "@opennextjs/aws/build/helper.js";
 +import { applyRule, parseCode } from "@opennextjs/aws/build/patch/astCodePatcher.js";
@@ -58,6 +58,7 @@ index 0000000000000000000000000000000000000000..766c9c149d01a2c3a0d527a1884168cc
 +    return { name: "patch-cache-components", setup() {} };
 +  }
 +  let patchedFiles = 0;
++  let patchedCacheFiles = 0;
 +  updater.updateContent("cache-components-scheduler", [
 +    {
 +      filter: runnerFileFilter,
@@ -68,6 +69,26 @@ index 0000000000000000000000000000000000000000..766c9c149d01a2c3a0d527a1884168cc
 +      }
 +    }
 +  ]);
++  // Next 16.4 shares pending fills until the leader's cache write settles.
++  // Workers may retire that request's I/O context first, hanging every joiner.
++  // Persistent handler caching and intra-request dedupe are unaffected.
++  // https://github.com/opennextjs/opennextjs-cloudflare/issues/1464
++  const needsCacheIsolation = compareSemver(buildOpts.nextVersion, ">=", "16.4.0");
++  if (needsCacheIsolation) {
++    updater.updateContent("cache-components-request-isolation", [{
++      filter: getCrossPlatformPathRegex(String.raw`/(?:next/dist/compiled/next-server/app-page(?:-turbo)?(?:-experimental)?\.runtime\.prod|\.next/server/chunks/.+|next/dist/(?:esm/)?server/use-cache/use-cache-wrapper)\.js$`, { escape: false }),
++      contentFilter: /skipCrossRequestDedupe|isDraftMode;try\{for\(;/,
++      callback: async ({ contents, path: filePath }) => {
++        const root = parseCode(contents);
++        const { edits } = applyRule(crossRequestCacheDedupeRule, root);
++        if (edits.length === 0) {
++          throw new Error(`Expected the cross-request cache dedupe flag in ${filePath}. Review the Workers isolation patch for Next.js ${buildOpts.nextVersion}.`);
++        }
++        patchedCacheFiles++;
++        return root.commitEdits(edits);
++      },
++    }]);
++  }
 +  return {
 +    name: "patch-cache-components",
 +    setup(build) {
@@ -78,10 +99,25 @@ index 0000000000000000000000000000000000000000..766c9c149d01a2c3a0d527a1884168cc
 +        if (result.errors.length === 0 && patchedFiles === 0) {
 +          throw new Error(`Cache Components is enabled but \`runInSequentialTasks\` was not found in Next.js ${buildOpts.nextVersion}. The app would render incomplete responses on Workers. Please report this to @opennextjs/cloudflare.`);
 +        }
++        if (result.errors.length === 0 && needsCacheIsolation && patchedCacheFiles === 0) {
++          throw new Error(`No cross-request cache dedupe flags were patched for Next.js ${buildOpts.nextVersion}. Refusing to build a Worker with shared pending cache fills.`);
++        }
 +      });
 +    }
 +  };
 +}
++export const crossRequestCacheDedupeRule = `
++rule:
++  kind: variable_declarator
++  any:
++    - pattern:
++        selector: variable_declarator
++        context: "const $FLAG = $PRIVATE && !process.env.__NEXT_DEV_SERVER || $STORE.isDraftMode;"
++    - pattern:
++        selector: variable_declarator
++        context: "let $FLAG = $PRIVATE && !0 || $STORE.isDraftMode;"
++fix: $FLAG = true
++`;
 +export function patchRunInSequentialTasks(code, filePath) {
 +  const root = parseCode(code);
 +  const { edits } = applyRule(runInSequentialTasksRule, root);

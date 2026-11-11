@@ -97,7 +97,8 @@ On Workers, `experimental.disableResumeDataCacheCompression` avoids a workerd
 shell can leave the forecast stuck on “Looking at the skies.” Build and deploy
 together so the persisted resume state and runtime use the same format.
 
-The pinned Cloudflare adapter also carries the scheduler backport documented in
+The pinned Cloudflare adapter also carries the scheduler and request-isolation
+patches documented in
 [patches/README.md](patches/README.md). It prevents incomplete runtime prefetches
 and stalled navigation streams on workerd while preserving Cache Components and
 intent prefetching. Bun applies it automatically during a frozen-lockfile install.
@@ -137,12 +138,18 @@ bun run check:client
 ```
 
 `bun run test:e2e:worker` additionally builds the Cloudflare bundle and runs
-desktop/mobile Chromium against Wrangler on **8788**. It exercises the actual
+desktop/mobile Chromium and desktop Firefox against Wrangler on **8788**
+(install them with `bunx playwright install chromium firefox`). It exercises the actual
 Workers runtime, including initial forecast streaming and revisiting cities
 after a minute with forecast/page requests blocked. These integration tests use
 the gateway configured in `wrangler.toml`; the build also needs a reachable
 backend (`IPMA_GRPC_URL`, as with `build:cf`). They are separate from the
 self-contained gRPC fixture suite below.
+
+Set `WORKER_TEST_URL` when running `bunx playwright test --config
+playwright.worker.config.ts` to target an already-deployed Worker instead of
+starting Wrangler. This is important for cache-fill isolation failures that
+can reproduce remotely while the same local workload passes.
 
 Vitest covers protobuf-to-DTO mapping, zero and absent values, civil dates,
 weather codes, API validation/errors, and DB hydration/request isolation.

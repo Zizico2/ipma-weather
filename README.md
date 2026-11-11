@@ -97,6 +97,11 @@ On Workers, `experimental.disableResumeDataCacheCompression` avoids a workerd
 shell can leave the forecast stuck on “Looking at the skies.” Build and deploy
 together so the persisted resume state and runtime use the same format.
 
+The pinned Cloudflare adapter also carries the scheduler backport documented in
+[patches/README.md](patches/README.md). It prevents incomplete runtime prefetches
+and stalled navigation streams on workerd while preserving Cache Components and
+intent prefetching. Bun applies it automatically during a frozen-lockfile install.
+
 All requested framework features remain enabled. The two deliberate dependency
 choices are TanStack DB's current RC for native SSR support, and the community
 StyleX SWC integration to retain the native Next compiler pipeline. Astryx is

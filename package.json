@@ -62,5 +62,8 @@
     "typescript": "7.0.2",
     "vitest": "5.1.0",
     "wrangler": "4.160.0"
+  },
+  "patchedDependencies": {
+    "@opennextjs/cloudflare@1.20.16": "patches/@opennextjs%2Fcloudflare@1.20.16.patch"
   }
 }

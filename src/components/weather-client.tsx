@@ -4,6 +4,7 @@ import { Banner } from '@astryxdesign/core/Banner';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
 import { Carousel } from '@astryxdesign/core/Carousel';
+import { Divider } from '@astryxdesign/core/Divider';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Grid } from '@astryxdesign/core/Grid';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -12,7 +13,6 @@ import {
   MetadataList,
   MetadataListItem,
 } from '@astryxdesign/core/MetadataList';
-import { Section } from '@astryxdesign/core/Section';
 import {
   SegmentedControl,
   SegmentedControlItem,
@@ -255,11 +255,8 @@ function WeatherDashboard({ location }: { location: WeatherLocation }) {
             </Carousel>
           </Stack>
 
-          <Section
-            dividers={['top', 'bottom']}
-            paddingBlock={5}
-            paddingInline={0}
-          >
+          <Stack gap={5}>
+            <Divider isFullBleed />
             <MetadataList columns="multi">
               <MetadataListItem
                 label="Chance of rain"
@@ -284,7 +281,8 @@ function WeatherDashboard({ location }: { location: WeatherLocation }) {
                   : 'Unavailable'}
               </MetadataListItem>
             </MetadataList>
-          </Section>
+            <Divider isFullBleed />
+          </Stack>
           <Stack gap={3}>
             <Stack
               direction="horizontal"

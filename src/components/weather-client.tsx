@@ -12,12 +12,12 @@ import {
   MetadataList,
   MetadataListItem,
 } from '@astryxdesign/core/MetadataList';
-import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { Section } from '@astryxdesign/core/Section';
 import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
+import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import { Stack, StackItem } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
@@ -198,62 +198,61 @@ function WeatherDashboard({ location }: { location: WeatherLocation }) {
                 {forecasts.length}-day forecast
               </Text>
             </Stack>
-            <RadioList
-              label="Forecast day"
-              isLabelHidden
-              value={selected.date}
-              onChange={setDate}
-            >
-              <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
-                {forecasts.map((day) => (
-                  <Card
+            <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
+              {forecasts.map((day) => {
+                const isSelected = day.id === selected.id;
+                return (
+                  <SelectableCard
                     key={day.id}
                     width={200}
                     height="100%"
-                    variant={
-                      day.id === selected.id ? 'forecast-selected' : 'default'
-                    }
+                    label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
+                    isSelected={isSelected}
+                    onChange={(next) => {
+                      if (next) setDate(day.date);
+                    }}
+                    variant={isSelected ? 'forecast-selected' : 'default'}
                   >
-                    <RadioListItem
-                      value={day.date}
-                      align="first-line"
-                      label={dayLabel(day.date, 'long')}
-                      aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
-                      description={
-                        <Stack as="span" gap={4} paddingBlockStart={3}>
-                          <Stack as="span" align="center" gap={3}>
-                            <WeatherIcon code={day.weatherCode} />
-                            <Text size="xl" hasTabularNumbers>
-                              {temperature(day.maximum, unit)}{' '}
-                              <Text color="secondary">
-                                {temperature(day.minimum, unit)}
-                              </Text>
-                            </Text>
-                            <Text type="supporting" color="secondary">
-                              {day.condition}
-                            </Text>
-                          </Stack>
-                          <Stack
-                            as="span"
-                            direction="horizontal"
-                            align="center"
-                            justify="center"
-                            gap={1}
-                          >
-                            <Icon icon={Droplets} size="sm" />
-                            <Text type="supporting">
-                              {day.rain === null
-                                ? '—'
-                                : `${Math.round(day.rain)}%`}
-                            </Text>
-                          </Stack>
-                        </Stack>
-                      }
-                    />
-                  </Card>
-                ))}
-              </Carousel>
-            </RadioList>
+                    <Stack align="center" gap={3} width="100%">
+                      <Text type="label" justify="center" display="block">
+                        {dayLabel(day.date, 'long')}
+                      </Text>
+                      <WeatherIcon code={day.weatherCode} />
+                      <Text
+                        size="xl"
+                        justify="center"
+                        display="block"
+                        hasTabularNumbers
+                      >
+                        {temperature(day.maximum, unit)}{' '}
+                        <Text color="secondary">
+                          {temperature(day.minimum, unit)}
+                        </Text>
+                      </Text>
+                      <Text
+                        type="supporting"
+                        color="secondary"
+                        justify="center"
+                        display="block"
+                      >
+                        {day.condition}
+                      </Text>
+                      <Stack
+                        direction="horizontal"
+                        align="center"
+                        justify="center"
+                        gap={1}
+                      >
+                        <Icon icon={Droplets} size="sm" />
+                        <Text type="supporting">
+                          {day.rain === null ? '—' : `${Math.round(day.rain)}%`}
+                        </Text>
+                      </Stack>
+                    </Stack>
+                  </SelectableCard>
+                );
+              })}
+            </Carousel>
           </Stack>
 
           <Section

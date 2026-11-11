@@ -28,7 +28,8 @@ test('hydrates, changes units and days, searches and navigates cities', async ({
   await page.getByRole('radio', { name: '°F', exact: true }).click();
   await expect(forecast.getByText('72°F', { exact: true })).toBeVisible();
   await page
-    .getByRole('radio', { name: 'Thursday 12 Nov, Light showers/rain' })
+    .getByRole('region', { name: 'Daily forecasts' })
+    .getByText('Thursday 12 Nov', { exact: true })
     .click();
   await expect(forecast.getByText('73°F', { exact: true })).toBeVisible();
   await (await locationSearch(page)).fill('porto');

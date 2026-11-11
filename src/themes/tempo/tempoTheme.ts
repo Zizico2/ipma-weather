@@ -66,6 +66,11 @@ export const tempoTheme = defineTheme({
         borderColor: 'var(--color-border-emphasized)',
       },
     },
+    'selectable-card': {
+      'variant:forecast-selected': {
+        '--selectable-card-ring-color': 'transparent',
+      },
+    },
     'side-nav-item': {
       selected: {
         backgroundColor: 'var(--color-accent-muted)',

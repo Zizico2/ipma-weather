@@ -561,6 +561,10 @@
     --astryx-section-padding: var(--spacing-3);
   }
 
+  .astryx-selectable-card[data-variant="forecast-selected"] {
+    --selectable-card-ring-color: transparent;
+  }
+
   .astryx-side-nav-item[data-selected="selected"] {
     background-color: var(--color-accent-muted);
     color: var(--color-text-accent);

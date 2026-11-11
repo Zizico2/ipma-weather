@@ -461,6 +461,11 @@ export const tempoTheme = {
         "padding": "var(--spacing-3)"
       }
     },
+    "selectable-card": {
+      "variant:forecast-selected": {
+        "--selectable-card-ring-color": "transparent"
+      }
+    },
     "side-nav-item": {
       "selected": {
         "backgroundColor": "var(--color-accent-muted)",

@@ -26,6 +26,19 @@ requirements. Do not prefix this variable with `NEXT_PUBLIC_`.
 backend to prerender Lisbon; keep the backend available during the build.
 Other cities stream into the shared static shell at request time.
 
+The root layout includes the cached location picker, so it is searchable before
+a city's forecast arrives and its search text survives city navigation. The
+location catalogue crosses the RSC boundary as plain props; the forecast uses
+TanStack DB's native dehydration and hydration. Active-link styling is isolated
+behind its own Suspense boundary so reading the current URL does not delay the
+picker. The forecast remains one streaming section, since its metrics come
+from the same RPC.
+
+City links prefetch the shared shell by default. Hovering or focusing a link
+opts that link into `prefetch={true}`, including its cached city forecast.
+Leaving the link restores the default shell-only prefetch policy. A cold
+forecast cache can still take time to fill before navigation.
+
 ## Stack and boundaries
 
 | Layer        | Implementation                                                                        |
@@ -54,11 +67,13 @@ their own Hono endpoint. Browser collection queries use `/api/locations` and
 sanitized 503 as appropriate.
 
 The server allocates a fresh `DbClient` and `QueryClient` for each snapshot
-computation, preloads descriptor-backed collections, dehydrates them, and cleans
-up both clients. The serialized snapshot is cached with the forecast; this also
+computation, preloads the ordered forecast live query, dehydrates its result
+without serializing its source collection, and cleans up both clients.
+The serialized snapshot is cached with the forecast; this also
 contains the timestamps DB records internally within a valid cache boundary.
-The browser hydrates a separate client per mounted city view. No process-wide
-collection state is shared between server renders.
+The browser hydrates one app-scoped client, preserving live-query state when
+Next's Activity hides a city view and restores it on browser Back/Forward.
+No process-wide collection state is shared between server renders.
 
 All protobuf code lives under `src/server/gen`. Only plain, validated weather
 DTOs cross the RSC boundary. `server-only` protects the gRPC entry point;
@@ -100,6 +115,7 @@ bun run typecheck
 bun run test
 bunx playwright install chromium
 bun run test:e2e
+bun run test:e2e:production
 bun run build
 bun run check:client
 ```
@@ -111,6 +127,14 @@ HTTP/2 gRPC fixture. It covers streamed server HTML with JS disabled, hydration,
 city navigation, units, day selection, refresh failure with retained data,
 empty/missing data, backend failure, and unknown locations. With JS disabled,
 late Suspense HTML is present but React's reveal script cannot run.
+
+Navigation tests use Next's `instant()` helper to hold back request-time data
+and verify that the picker remains interactive and preserves its search.
+The production suite also verifies that hover and keyboard focus receive a
+city's forecast before clicking, then render it while navigation is paused.
+These prefetch tests are skipped in `next dev`, where prefetching is disabled.
+Only the production test build enables `EXPOSE_TESTING_API=1`; normal builds
+keep Next's testing API disabled.
 
 E2E runs its own gRPC server on **50061** and Next on **3001**, with a separate
 `.next-e2e` build directory. The fixture is test-only; the app never falls back

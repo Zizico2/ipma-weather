@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import './globals.css';
+import { LocationSidebarData } from '../components/location-sidebar-data';
+import { WeatherShell } from '../components/weather-shell';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
@@ -13,7 +15,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <WeatherShell sidebar={<LocationSidebarData />}>
+            {children}
+          </WeatherShell>
+        </Providers>
       </body>
     </html>
   );

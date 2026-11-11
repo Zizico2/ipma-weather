@@ -2,7 +2,13 @@ import * as stylex from '@stylexjs/stylex';
 import { ArrowUpRight, CloudSun } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-export function WeatherShell({ children }: { children: ReactNode }) {
+export function WeatherShell({
+  children,
+  sidebar,
+}: {
+  children: ReactNode;
+  sidebar: ReactNode;
+}) {
   return (
     <div {...stylex.props(styles.page)}>
       <a href="#forecast" {...stylex.props(styles.skip)}>
@@ -22,7 +28,12 @@ export function WeatherShell({ children }: { children: ReactNode }) {
           Weather by IPMA <ArrowUpRight size={15} aria-hidden="true" />
         </a>
       </header>
-      {children}
+      <div {...stylex.props(styles.layout)}>
+        {sidebar}
+        <main id="forecast" {...stylex.props(styles.content)}>
+          {children}
+        </main>
+      </div>
       <footer {...stylex.props(styles.footer)}>
         <span>Made for whatever the weather brings.</span>
         <span>
@@ -35,15 +46,26 @@ export function WeatherShell({ children }: { children: ReactNode }) {
 
 export function WeatherLoading() {
   return (
-    <main id="forecast" {...stylex.props(styles.loading)} aria-busy="true">
+    <section {...stylex.props(styles.loading)} aria-busy="true">
       <p {...stylex.props(styles.eyebrow)}>PORTUGAL / WEATHER</p>
       <h1 {...stylex.props(styles.title)}>Looking at the skies.</h1>
       <p>Loading the forecast from IPMA…</p>
-    </main>
+    </section>
   );
 }
 
 const styles = stylex.create({
+  layout: {
+    display: 'grid',
+    gridTemplateColumns: {
+      default: '230px minmax(0, 1fr)',
+      '@media (max-width: 900px)': '190px minmax(0, 1fr)',
+      '@media (max-width: 700px)': '1fr',
+    },
+    gap: { default: 54, '@media (max-width: 1100px)': 30 },
+    paddingBlock: { default: 44, '@media (max-width: 700px)': 28 },
+  },
+  content: { minWidth: 0 },
   page: {
     color: '#192e32',
     maxWidth: 1480,

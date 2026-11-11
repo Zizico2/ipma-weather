@@ -7,6 +7,10 @@
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "build:cf": "opennextjs-cloudflare build",
+    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "start": "next start --hostname 127.0.0.1",
     "lint": "biome check .",
     "format": "biome check --write .",
@@ -14,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:production": "E2E_PRODUCTION=1 playwright test",
     "proto:generate": "bun scripts/generate-proto.ts",
     "check:client": "bun scripts/check-client-bundle.ts",
     "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs"
@@ -24,6 +29,8 @@
     "@bufbuild/protobuf": "2.17.0",
     "@connectrpc/connect": "2.3.0",
     "@connectrpc/connect-node": "2.3.0",
+    "@connectrpc/connect-web": "2.3.0",
+    "@opennextjs/cloudflare": "1.20.16",
     "@stylexjs/stylex": "0.19.1",
     "@tanstack/db": "1.0.0-rc.1.4",
     "@tanstack/query-core": "5.107.1",
@@ -42,6 +49,7 @@
     "@biomejs/biome": "2.6.6",
     "@bufbuild/buf": "1.75.0",
     "@bufbuild/protoc-gen-es": "2.17.0",
+    "@next/playwright": "16.4.6",
     "@playwright/test": "1.65.0",
     "@stylexswc/nextjs-plugin": "0.20.0",
     "@stylexswc/postcss-plugin": "0.20.0",
@@ -51,6 +59,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "wrangler": "4.160.0"
   }
 }

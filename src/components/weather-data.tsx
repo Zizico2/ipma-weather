@@ -1,10 +1,6 @@
 import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
-import {
-  createWeatherDb,
-  forecastCollection,
-  locationsCollection,
-} from '../lib/collections';
+import { createWeatherDb, forecastQuery } from '../lib/collections';
 import { getForecast, getLocations } from '../server/weather';
 import { WeatherClient } from './weather-client';
 
@@ -14,7 +10,8 @@ export async function WeatherData({ locationId }: { locationId: number }) {
   // together with the data so it is safe to include in Next's prerendered shell.
   cacheLife({ stale: 60, revalidate: 300, expire: 1800 });
   const locations = await getLocations();
-  if (!locations.some((location) => location.id === locationId)) notFound();
+  const location = locations.find((location) => location.id === locationId);
+  if (!location) notFound();
   const forecasts = await getForecast(locationId);
   // Each server render owns its DB and QueryClient. No process-wide collection state.
   const { db, queryClient } = createWeatherDb({
@@ -22,15 +19,12 @@ export async function WeatherData({ locationId }: { locationId: number }) {
     forecast: async () => forecasts,
   });
   try {
-    await Promise.all([
-      db.collection(locationsCollection).preload(),
-      db.collection(forecastCollection(locationId)).preload(),
-    ]);
+    await db.preloadLiveQuery({ query: forecastQuery(locationId) });
     return (
       <WeatherClient
         key={locationId}
-        locationId={locationId}
-        state={db.dehydrate()}
+        location={location}
+        state={db.dehydrate({ shouldDehydrateCollection: () => false })}
       />
     );
   } finally {

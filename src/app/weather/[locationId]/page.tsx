@@ -1,10 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { WeatherData } from '../../../components/weather-data';
-import {
-  WeatherLoading,
-  WeatherShell,
-} from '../../../components/weather-shell';
+import { WeatherLoading } from '../../../components/weather-shell';
 import { parseLocationId } from '../../../lib/weather';
 
 async function CityWeather({
@@ -23,10 +20,8 @@ export default function Page({
   params: Promise<{ locationId: string }>;
 }) {
   return (
-    <WeatherShell>
-      <Suspense fallback={<WeatherLoading />}>
-        <CityWeather params={params} />
-      </Suspense>
-    </WeatherShell>
+    <Suspense fallback={<WeatherLoading />}>
+      <CityWeather params={params} />
+    </Suspense>
   );
 }

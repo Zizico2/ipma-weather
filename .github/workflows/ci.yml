@@ -16,7 +16,7 @@ jobs:
       - run: bun run typecheck
       - run: bun run test
       - run: bunx playwright install --with-deps chromium
-      - run: bun run test:e2e
+      - run: bun run test:e2e:production
       - name: Build against the deterministic gRPC fixture
         env:
           IPMA_GRPC_URL: http://127.0.0.1:50061

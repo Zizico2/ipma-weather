@@ -1,11 +1,9 @@
 'use client';
 
 import { Button } from '@astryxdesign/core/Button';
-import { TextInput } from '@astryxdesign/core/TextInput';
 import * as stylex from '@stylexjs/stylex';
 import type { DehydratedDbState } from '@tanstack/db';
 import {
-  DbProvider,
   HydrationBoundary,
   useDbClient,
   useLiveQuery,
@@ -13,88 +11,43 @@ import {
 import {
   ArrowDown,
   ArrowUp,
-  ArrowUpRight,
   Droplets,
   MapPin,
   RefreshCw,
   Wind,
 } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import {
-  createWeatherDb,
-  forecastCollection,
-  locationsCollection,
-} from '../lib/collections';
-import { httpLoader } from '../lib/http';
-import { dayLabel, temperature } from '../lib/weather';
+import { useEffect, useState } from 'react';
+import { forecastCollection, forecastQuery } from '../lib/collections';
+import { dayLabel, temperature, type WeatherLocation } from '../lib/weather';
 import { WeatherIcon } from './weather-icon';
 
 export function WeatherClient({
-  locationId,
+  location,
   state,
 }: {
-  locationId: number;
+  location: WeatherLocation;
   state: DehydratedDbState;
 }) {
-  const [scope] = useState(() => createWeatherDb(httpLoader));
-  const cleanup = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  useEffect(() => {
-    clearTimeout(cleanup.current);
-    return () => {
-      // Delay teardown across Strict Mode's immediate effect replay.
-      cleanup.current = setTimeout(() => {
-        void scope.db.cleanup();
-        scope.queryClient.clear();
-      }, 0);
-    };
-  }, [scope]);
   return (
-    <DbProvider client={scope.db}>
-      <HydrationBoundary state={state}>
-        <WeatherDashboard locationId={locationId} />
-      </HydrationBoundary>
-    </DbProvider>
+    <HydrationBoundary state={state}>
+      <WeatherDashboard location={location} />
+    </HydrationBoundary>
   );
 }
 
-function WeatherDashboard({ locationId }: { locationId: number }) {
+function WeatherDashboard({ location }: { location: WeatherLocation }) {
   const db = useDbClient();
-  const [descriptor] = useState(() => forecastCollection(locationId));
-  const { data: locations } = useLiveQuery({
-    query: (q) =>
-      q
-        .from({ location: locationsCollection })
-        .orderBy(({ location }) => location.name, 'asc'),
-  });
+  const [descriptor] = useState(() => forecastCollection(location.id));
   const { data: forecasts } = useLiveQuery({
-    query: (q) =>
-      q
-        .from({ forecast: descriptor })
-        .orderBy(({ forecast }) => forecast.date, 'asc'),
+    query: forecastQuery(location.id),
   });
-  const [search, setSearch] = useState('');
   const [unit, setUnit] = useState<'C' | 'F'>('C');
   const [date, setDate] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
   const [error, setError] = useState('');
-  const location = locations.find((row) => row.id === locationId);
   const selected = forecasts.find((row) => row.date === date) ?? forecasts[0];
-  const filtered = locations.filter((row) =>
-    row.name
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .includes(
-        search
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase(),
-      ),
-  );
-
   async function refresh() {
     setRefreshing(true);
     setError('');
@@ -112,245 +65,188 @@ function WeatherDashboard({ locationId }: { locationId: number }) {
   }
 
   return (
-    <main id="forecast" {...stylex.props(styles.layout)}>
-      <aside {...stylex.props(styles.sidebar)} aria-label="Locations">
-        <p {...stylex.props(styles.eyebrow)}>FIND YOUR FORECAST</p>
-        <h2 {...stylex.props(styles.sidebarTitle)}>
-          Somewhere
-          <br />
-          in Portugal.
-        </h2>
-        <TextInput
-          label="Search locations"
-          value={search}
-          onChange={setSearch}
-          placeholder="Search a city…"
-          type="search"
-          hasClear
-        />
-        <p {...stylex.props(styles.listLabel)}>
-          {search ? `${filtered.length} PLACES FOUND` : 'EXPLORE LOCATIONS'}
-        </p>
-        <nav {...stylex.props(styles.locations)} aria-label="Choose a location">
-          {filtered.map((city) => (
-            <Link
-              key={city.id}
-              href={`/weather/${city.id}`}
-              aria-current={city.id === locationId ? 'page' : undefined}
+    <section {...stylex.props(styles.content)} aria-label="Weather forecast">
+      <div {...stylex.props(styles.titleRow)}>
+        <div>
+          <p {...stylex.props(styles.eyebrow)}>YOUR DAILY OUTLOOK</p>
+          <h1 {...stylex.props(styles.title)}>
+            {location?.name ?? 'Portugal'}
+            <span {...stylex.props(styles.comma)}>,</span>
+          </h1>
+          <p {...stylex.props(styles.subtitle)}>
+            A good day starts with a little outlook.
+          </p>
+        </div>
+        <fieldset {...stylex.props(styles.units)} aria-label="Temperature unit">
+          {(['C', 'F'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setUnit(value)}
+              aria-pressed={unit === value}
               {...stylex.props(
-                styles.location,
-                city.id === locationId && styles.locationActive,
+                styles.unit,
+                unit === value && styles.unitActive,
               )}
             >
-              <span>{city.name}</span>
-              {city.id === locationId ? (
-                <MapPin size={15} aria-hidden="true" />
-              ) : (
-                <ArrowUpRight size={14} aria-hidden="true" />
-              )}
-            </Link>
+              °{value}
+            </button>
           ))}
-          {filtered.length === 0 && (
-            <p {...stylex.props(styles.muted)}>
-              No locations found. Try another name.
-            </p>
-          )}
-        </nav>
-        <div {...stylex.props(styles.sidebarFoot)}>
-          <span {...stylex.props(styles.greenDot)} /> Mainland & islands
-          <br />
-          <span {...stylex.props(styles.muted)}>
-            One country. Many kinds of weather.
-          </span>
-        </div>
-      </aside>
+        </fieldset>
+      </div>
 
-      <section {...stylex.props(styles.content)} aria-label="Weather forecast">
-        <div {...stylex.props(styles.titleRow)}>
-          <div>
-            <p {...stylex.props(styles.eyebrow)}>YOUR DAILY OUTLOOK</p>
-            <h1 {...stylex.props(styles.title)}>
-              {location?.name ?? 'Portugal'}
-              <span {...stylex.props(styles.comma)}>,</span>
-            </h1>
-            <p {...stylex.props(styles.subtitle)}>
-              A good day starts with a little outlook.
-            </p>
+      {!selected ? (
+        <div {...stylex.props(styles.empty)} role="status">
+          <h2>No forecast published yet.</h2>
+          <p>Try another location or check back soon.</p>
+          <Button
+            label="Check again"
+            onClick={() => void refresh()}
+            isLoading={refreshing}
+            isDisabled={!hydrated}
+          />
+        </div>
+      ) : (
+        <>
+          <div {...stylex.props(styles.hero)}>
+            <div {...stylex.props(styles.heroCopy)}>
+              <p {...stylex.props(styles.heroLabel)}>
+                {dayLabel(selected.date, 'long')}{' '}
+                <span {...stylex.props(styles.heroPill)}>DAILY FORECAST</span>
+              </p>
+              <div {...stylex.props(styles.heroTemp)}>
+                {temperature(selected.maximum, unit)}
+                <span {...stylex.props(styles.heroUnit)}>{unit}</span>
+              </div>
+              <p {...stylex.props(styles.condition)}>{selected.condition}</p>
+              <div {...stylex.props(styles.highLow)}>
+                <span {...stylex.props(styles.highLowItem)}>
+                  <ArrowUp size={14} aria-hidden="true" />{' '}
+                  {temperature(selected.maximum, unit)} high
+                </span>
+                <span {...stylex.props(styles.highLowItem)}>
+                  <ArrowDown size={14} aria-hidden="true" />{' '}
+                  {temperature(selected.minimum, unit)} low
+                </span>
+              </div>
+            </div>
+            <div {...stylex.props(styles.sky)} aria-hidden="true">
+              <div {...stylex.props(styles.orbit)} />
+              <div {...stylex.props(styles.orbitSmall)} />
+              <div {...stylex.props(styles.sun)} />
+              <div {...stylex.props(styles.heroIcon)}>
+                <WeatherIcon code={selected.weatherCode} size={90} />
+              </div>
+              <span {...stylex.props(styles.skyCaption)}>
+                A WINDOW TO THE WEATHER
+              </span>
+            </div>
           </div>
-          <fieldset
-            {...stylex.props(styles.units)}
-            aria-label="Temperature unit"
-          >
-            {(['C', 'F'] as const).map((value) => (
+
+          <div {...stylex.props(styles.sectionHeading)}>
+            <h2 {...stylex.props(styles.sectionTitle)}>The days ahead</h2>
+            <span {...stylex.props(styles.muted)}>
+              {forecasts.length}-day forecast
+            </span>
+          </div>
+          <div {...stylex.props(styles.forecastGrid)}>
+            {forecasts.map((day) => (
               <button
-                key={value}
                 type="button"
-                onClick={() => setUnit(value)}
-                aria-pressed={unit === value}
+                key={day.id}
+                aria-pressed={day.id === selected.id}
+                onClick={() => setDate(day.date)}
+                aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
                 {...stylex.props(
-                  styles.unit,
-                  unit === value && styles.unitActive,
+                  styles.day,
+                  day.id === selected.id && styles.dayActive,
                 )}
               >
-                °{value}
+                <span {...stylex.props(styles.dayName)}>
+                  {dayLabel(day.date).split(' ')[0]}
+                </span>
+                <span {...stylex.props(styles.dayDate)}>
+                  {dayLabel(day.date).split(' ').slice(1).join(' ')}
+                </span>
+                <div {...stylex.props(styles.dayIcon)}>
+                  <WeatherIcon code={day.weatherCode} />
+                </div>
+                <span {...stylex.props(styles.dayTemps)}>
+                  {temperature(day.maximum, unit)}{' '}
+                  <span {...stylex.props(styles.lowTemp)}>
+                    {temperature(day.minimum, unit)}
+                  </span>
+                </span>
+                <span {...stylex.props(styles.rain)}>
+                  <Droplets size={12} aria-hidden="true" />
+                  {day.rain === null ? '—' : `${Math.round(day.rain)}%`}
+                </span>
               </button>
             ))}
-          </fieldset>
-        </div>
+          </div>
 
-        {!selected ? (
-          <div {...stylex.props(styles.empty)} role="status">
-            <h2>No forecast published yet.</h2>
-            <p>Try another location or check back soon.</p>
+          <div {...stylex.props(styles.details)}>
+            <div {...stylex.props(styles.detail)}>
+              <Droplets size={21} strokeWidth={1.5} aria-hidden="true" />
+              <div>
+                <p {...stylex.props(styles.detailLabel)}>CHANCE OF RAIN</p>
+                <p {...stylex.props(styles.detailValue)}>
+                  {selected.rain === null
+                    ? 'Unavailable'
+                    : `${Math.round(selected.rain)}%`}
+                </p>
+              </div>
+            </div>
+            <div {...stylex.props(styles.detail)}>
+              <Wind size={22} strokeWidth={1.5} aria-hidden="true" />
+              <div>
+                <p {...stylex.props(styles.detailLabel)}>PREVAILING WIND</p>
+                <p {...stylex.props(styles.detailValue)}>
+                  {selected.windDirection || 'Unavailable'}
+                </p>
+              </div>
+            </div>
+            <div {...stylex.props(styles.detail)}>
+              <MapPin size={21} strokeWidth={1.5} aria-hidden="true" />
+              <div>
+                <p {...stylex.props(styles.detailLabel)}>COORDINATES</p>
+                <p {...stylex.props(styles.coordinate)}>
+                  {location?.latitude != null && location.longitude != null
+                    ? `${Math.abs(location.latitude).toFixed(2)}° ${location.latitude < 0 ? 'S' : 'N'} / ${Math.abs(location.longitude).toFixed(2)}° ${location.longitude < 0 ? 'W' : 'E'}`
+                    : 'Unavailable'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div {...stylex.props(styles.freshness)}>
+            <p {...stylex.props(styles.freshnessText)}>
+              Daily highs & lows, in °{unit}.{' '}
+              {selected.updatedAt
+                ? `Source updated ${formatTime(selected.updatedAt)}.`
+                : 'Source update time unavailable.'}
+              <br />
+              {selected.fetchedAt
+                ? `Retrieved ${formatTime(selected.fetchedAt)}. `
+                : ''}
+              Shared forecast cache · 5-minute revalidation.
+            </p>
             <Button
-              label="Check again"
+              label="Refresh"
+              variant="ghost"
+              size="sm"
+              icon={<RefreshCw size={14} aria-hidden="true" />}
               onClick={() => void refresh()}
               isLoading={refreshing}
               isDisabled={!hydrated}
             />
           </div>
-        ) : (
-          <>
-            <div {...stylex.props(styles.hero)}>
-              <div {...stylex.props(styles.heroCopy)}>
-                <p {...stylex.props(styles.heroLabel)}>
-                  {dayLabel(selected.date, 'long')}{' '}
-                  <span {...stylex.props(styles.heroPill)}>DAILY FORECAST</span>
-                </p>
-                <div {...stylex.props(styles.heroTemp)}>
-                  {temperature(selected.maximum, unit)}
-                  <span {...stylex.props(styles.heroUnit)}>{unit}</span>
-                </div>
-                <p {...stylex.props(styles.condition)}>{selected.condition}</p>
-                <div {...stylex.props(styles.highLow)}>
-                  <span {...stylex.props(styles.highLowItem)}>
-                    <ArrowUp size={14} aria-hidden="true" />{' '}
-                    {temperature(selected.maximum, unit)} high
-                  </span>
-                  <span {...stylex.props(styles.highLowItem)}>
-                    <ArrowDown size={14} aria-hidden="true" />{' '}
-                    {temperature(selected.minimum, unit)} low
-                  </span>
-                </div>
-              </div>
-              <div {...stylex.props(styles.sky)} aria-hidden="true">
-                <div {...stylex.props(styles.orbit)} />
-                <div {...stylex.props(styles.orbitSmall)} />
-                <div {...stylex.props(styles.sun)} />
-                <div {...stylex.props(styles.heroIcon)}>
-                  <WeatherIcon code={selected.weatherCode} size={90} />
-                </div>
-                <span {...stylex.props(styles.skyCaption)}>
-                  A WINDOW TO THE WEATHER
-                </span>
-              </div>
-            </div>
-
-            <div {...stylex.props(styles.sectionHeading)}>
-              <h2 {...stylex.props(styles.sectionTitle)}>The days ahead</h2>
-              <span {...stylex.props(styles.muted)}>
-                {forecasts.length}-day forecast
-              </span>
-            </div>
-            <div {...stylex.props(styles.forecastGrid)}>
-              {forecasts.map((day) => (
-                <button
-                  type="button"
-                  key={day.id}
-                  aria-pressed={day.id === selected.id}
-                  onClick={() => setDate(day.date)}
-                  aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
-                  {...stylex.props(
-                    styles.day,
-                    day.id === selected.id && styles.dayActive,
-                  )}
-                >
-                  <span {...stylex.props(styles.dayName)}>
-                    {dayLabel(day.date).split(' ')[0]}
-                  </span>
-                  <span {...stylex.props(styles.dayDate)}>
-                    {dayLabel(day.date).split(' ').slice(1).join(' ')}
-                  </span>
-                  <div {...stylex.props(styles.dayIcon)}>
-                    <WeatherIcon code={day.weatherCode} />
-                  </div>
-                  <span {...stylex.props(styles.dayTemps)}>
-                    {temperature(day.maximum, unit)}{' '}
-                    <span {...stylex.props(styles.lowTemp)}>
-                      {temperature(day.minimum, unit)}
-                    </span>
-                  </span>
-                  <span {...stylex.props(styles.rain)}>
-                    <Droplets size={12} aria-hidden="true" />
-                    {day.rain === null ? '—' : `${Math.round(day.rain)}%`}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <div {...stylex.props(styles.details)}>
-              <div {...stylex.props(styles.detail)}>
-                <Droplets size={21} strokeWidth={1.5} aria-hidden="true" />
-                <div>
-                  <p {...stylex.props(styles.detailLabel)}>CHANCE OF RAIN</p>
-                  <p {...stylex.props(styles.detailValue)}>
-                    {selected.rain === null
-                      ? 'Unavailable'
-                      : `${Math.round(selected.rain)}%`}
-                  </p>
-                </div>
-              </div>
-              <div {...stylex.props(styles.detail)}>
-                <Wind size={22} strokeWidth={1.5} aria-hidden="true" />
-                <div>
-                  <p {...stylex.props(styles.detailLabel)}>PREVAILING WIND</p>
-                  <p {...stylex.props(styles.detailValue)}>
-                    {selected.windDirection || 'Unavailable'}
-                  </p>
-                </div>
-              </div>
-              <div {...stylex.props(styles.detail)}>
-                <MapPin size={21} strokeWidth={1.5} aria-hidden="true" />
-                <div>
-                  <p {...stylex.props(styles.detailLabel)}>COORDINATES</p>
-                  <p {...stylex.props(styles.coordinate)}>
-                    {location?.latitude != null && location.longitude != null
-                      ? `${Math.abs(location.latitude).toFixed(2)}° ${location.latitude < 0 ? 'S' : 'N'} / ${Math.abs(location.longitude).toFixed(2)}° ${location.longitude < 0 ? 'W' : 'E'}`
-                      : 'Unavailable'}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div {...stylex.props(styles.freshness)}>
-              <p {...stylex.props(styles.freshnessText)}>
-                Daily highs & lows, in °{unit}.{' '}
-                {selected.updatedAt
-                  ? `Source updated ${formatTime(selected.updatedAt)}.`
-                  : 'Source update time unavailable.'}
-                <br />
-                {selected.fetchedAt
-                  ? `Retrieved ${formatTime(selected.fetchedAt)}. `
-                  : ''}
-                Shared forecast cache · 5-minute revalidation.
-              </p>
-              <Button
-                label="Refresh"
-                variant="ghost"
-                size="sm"
-                icon={<RefreshCw size={14} aria-hidden="true" />}
-                onClick={() => void refresh()}
-                isLoading={refreshing}
-                isDisabled={!hydrated}
-              />
-            </div>
-            <p {...stylex.props(styles.attribution)}>{selected.attribution}</p>
-          </>
-        )}
-        <div role="status" aria-live="polite">
-          {error && <p {...stylex.props(styles.error)}>{error}</p>}
-        </div>
-      </section>
-    </main>
+          <p {...stylex.props(styles.attribution)}>{selected.attribution}</p>
+        </>
+      )}
+      <div role="status" aria-live="polite">
+        {error && <p {...stylex.props(styles.error)}>{error}</p>}
+      </div>
+    </section>
   );
 }
 
@@ -366,84 +262,12 @@ function formatTime(value: string) {
 }
 
 const styles = stylex.create({
-  layout: {
-    display: 'grid',
-    gridTemplateColumns: {
-      default: '230px minmax(0, 1fr)',
-      '@media (max-width: 900px)': '190px minmax(0, 1fr)',
-      '@media (max-width: 700px)': '1fr',
-    },
-    gap: { default: 54, '@media (max-width: 1100px)': 30 },
-    paddingBlock: { default: 44, '@media (max-width: 700px)': 28 },
-  },
-  sidebar: {
-    display: 'flex',
-    flexDirection: 'column',
-    paddingRight: { default: 26, '@media (max-width: 700px)': 0 },
-    borderRightWidth: { default: 1, '@media (max-width: 700px)': 0 },
-    borderRightStyle: 'solid',
-    borderRightColor: '#d9ded7',
-  },
   eyebrow: {
     color: '#697b70',
     fontSize: 10,
     letterSpacing: '1.8px',
     fontWeight: 700,
     marginBottom: 12,
-  },
-  sidebarTitle: {
-    fontSize: 28,
-    fontWeight: 500,
-    letterSpacing: '-1px',
-    lineHeight: 1.15,
-    marginBottom: 30,
-    display: { default: 'block', '@media (max-width: 700px)': 'none' },
-  },
-  listLabel: {
-    color: '#718077',
-    fontSize: 9,
-    letterSpacing: '1.7px',
-    marginTop: 28,
-    marginBottom: 12,
-  },
-  locations: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 5,
-    maxHeight: { default: 405, '@media (max-width: 700px)': 130 },
-    overflowY: 'auto',
-    scrollbarWidth: 'thin',
-    paddingRight: 4,
-  },
-  location: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    textDecoration: 'none',
-    padding: '12px 14px',
-    borderRadius: 8,
-    fontSize: 13,
-    color: '#5d7067',
-    backgroundColor: { default: 'transparent', ':hover': '#e9ece2' },
-  },
-  locationActive: {
-    backgroundColor: { default: '#e4ebd6', ':hover': '#dce7c7' },
-    color: '#243a2a',
-    fontWeight: 700,
-  },
-  sidebarFoot: {
-    marginTop: 32,
-    fontSize: 11,
-    lineHeight: 2.1,
-    display: { default: 'block', '@media (max-width: 700px)': 'none' },
-  },
-  greenDot: {
-    display: 'inline-block',
-    width: 6,
-    height: 6,
-    backgroundColor: '#64844c',
-    borderRadius: '50%',
-    marginRight: 8,
   },
   muted: { color: '#65756e', fontSize: 11 },
   content: { minWidth: 0 },

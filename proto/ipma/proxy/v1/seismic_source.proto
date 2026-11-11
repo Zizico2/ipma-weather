@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/seismic/3.json
+// https://api.ipma.pt/open-data/observation/seismic/7.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Observed tokens only; new source tokens use OTHER. No unverified semantic expansion.
+enum SeismicSource {
+  SEISMIC_SOURCE_UNSPECIFIED = 0;
+  SEISMIC_SOURCE_OTHER = 1;
+  // Source: GFZ. Exact source token.
+  SEISMIC_SOURCE_GFZ = 2;
+  // Source: IPMA. Exact source token.
+  SEISMIC_SOURCE_IPMA = 3;
+}

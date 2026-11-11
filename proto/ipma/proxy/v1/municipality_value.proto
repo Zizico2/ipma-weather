@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/district_value.proto";
+import "ipma/proxy/v1/municipality.proto";
+
+// Absent source values omit this message. OTHER retains its source identity.
+// source_code is the full DICO with leading zeroes, supplied directly or composed
+// from idDistrito and idConcelho. Preserve those components when present.
+message MunicipalityValue {
+  Municipality value = 1;
+  // Exact original source representation, including unfamiliar values.
+  string source_code = 2;
+  // Local idConcelho is scoped by district, never globally unique by itself.
+  optional uint32 source_local_code = 3;
+  DistrictValue district = 4;
+}

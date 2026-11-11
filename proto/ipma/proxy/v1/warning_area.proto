@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/distrits-islands.json
+// https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Includes areas present only in warnings, as well as the location catalogue.
+enum WarningArea {
+  WARNING_AREA_UNSPECIFIED = 0;
+  WARNING_AREA_OTHER = 1;
+  // Source: ACE. IPMA warning area.
+  WARNING_AREA_ACE = 2;
+  // Source: AOC. IPMA warning area.
+  WARNING_AREA_AOC = 3;
+  // Source: AOR. IPMA warning area.
+  WARNING_AREA_AOR = 4;
+  // Source: AVR. IPMA warning area.
+  WARNING_AREA_AVR = 5;
+  // Source: BGC. IPMA warning area.
+  WARNING_AREA_BGC = 6;
+  // Source: BJA. IPMA warning area.
+  WARNING_AREA_BJA = 7;
+  // Source: BRG. IPMA warning area.
+  WARNING_AREA_BRG = 8;
+  // Source: CBO. IPMA warning area.
+  WARNING_AREA_CBO = 9;
+  // Source: CBR. IPMA warning area.
+  WARNING_AREA_CBR = 10;
+  // Source: EVR. IPMA warning area.
+  WARNING_AREA_EVR = 11;
+  // Source: FAR. IPMA warning area.
+  WARNING_AREA_FAR = 12;
+  // Source: GDA. IPMA warning area.
+  WARNING_AREA_GDA = 13;
+  // Source: LRA. IPMA warning area.
+  WARNING_AREA_LRA = 14;
+  // Source: LSB. IPMA warning area.
+  WARNING_AREA_LSB = 15;
+  // Source: MCN. IPMA warning area.
+  WARNING_AREA_MCN = 16;
+  // Source: MCS. IPMA warning area.
+  WARNING_AREA_MCS = 17;
+  // Source: MPS. IPMA warning area.
+  WARNING_AREA_MPS = 18;
+  // Source: MRM. IPMA warning area.
+  WARNING_AREA_MRM = 19;
+  // Source: PTG. IPMA warning area.
+  WARNING_AREA_PTG = 20;
+  // Source: PTO. IPMA warning area.
+  WARNING_AREA_PTO = 21;
+  // Source: STB. IPMA warning area.
+  WARNING_AREA_STB = 22;
+  // Source: STM. IPMA warning area.
+  WARNING_AREA_STM = 23;
+  // Source: VCT. IPMA warning area.
+  WARNING_AREA_VCT = 24;
+  // Source: VIS. IPMA warning area.
+  WARNING_AREA_VIS = 25;
+  // Source: VRL. IPMA warning area.
+  WARNING_AREA_VRL = 26;
+}

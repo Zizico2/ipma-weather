@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// IPMA fire-risk classes 1..5. Municipality identity remains reference data.
+enum FireRiskClass {
+  FIRE_RISK_CLASS_UNSPECIFIED = 0;
+  FIRE_RISK_CLASS_REDUCED = 1;
+  FIRE_RISK_CLASS_MODERATE = 2;
+  FIRE_RISK_CLASS_HIGH = 3;
+  FIRE_RISK_CLASS_VERY_HIGH = 4;
+  FIRE_RISK_CLASS_MAXIMUM = 5;
+  // A present upstream value outside the currently recognised vocabulary.
+  FIRE_RISK_CLASS_OTHER = 6;
+}

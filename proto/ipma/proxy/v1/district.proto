@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/distrits-islands.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// IPMA idDistrito includes island identifiers; it is not restricted to mainland districts.
+enum District {
+  DISTRICT_UNSPECIFIED = 0;
+  DISTRICT_OTHER = 1;
+  // Source: 1. Aveiro
+  DISTRICT_AVEIRO = 2;
+  // Source: 2. Beja
+  DISTRICT_BEJA = 3;
+  // Source: 3. Braga
+  DISTRICT_BRAGA = 4;
+  // Source: 4. Bragança
+  DISTRICT_BRAGANCA = 5;
+  // Source: 5. Castelo Branco
+  DISTRICT_CASTELO_BRANCO = 6;
+  // Source: 6. Coimbra
+  DISTRICT_COIMBRA = 7;
+  // Source: 7. Évora
+  DISTRICT_EVORA = 8;
+  // Source: 8. Faro
+  DISTRICT_FARO = 9;
+  // Source: 9. Guarda
+  DISTRICT_GUARDA = 10;
+  // Source: 10. Leiria
+  DISTRICT_LEIRIA = 11;
+  // Source: 11. Lisboa
+  DISTRICT_LISBOA = 12;
+  // Source: 12. Portalegre
+  DISTRICT_PORTALEGRE = 13;
+  // Source: 13. Porto
+  DISTRICT_PORTO = 14;
+  // Source: 14. Santarém
+  DISTRICT_SANTAREM = 15;
+  // Source: 15. Setúbal
+  DISTRICT_SETUBAL = 16;
+  // Source: 16. Viana do Castelo
+  DISTRICT_VIANA_DO_CASTELO = 17;
+  // Source: 17. Vila Real
+  DISTRICT_VILA_REAL = 18;
+  // Source: 18. Viseu
+  DISTRICT_VISEU = 19;
+  // Source: 31. Madeira
+  DISTRICT_MADEIRA = 20;
+  // Source: 32. Porto Santo
+  DISTRICT_PORTO_SANTO = 21;
+  // Source: 41. Santa Maria
+  DISTRICT_SANTA_MARIA = 22;
+  // Source: 42. São Miguel
+  DISTRICT_SAO_MIGUEL = 23;
+  // Source: 43. Terceira
+  DISTRICT_TERCEIRA = 24;
+  // Source: 44. Graciosa
+  DISTRICT_GRACIOSA = 25;
+  // Source: 45. São Jorge
+  DISTRICT_SAO_JORGE = 26;
+  // Source: 46. Pico
+  DISTRICT_PICO = 27;
+  // Source: 47. Faial
+  DISTRICT_FAIAL = 28;
+  // Source: 48. Flores
+  DISTRICT_FLORES = 29;
+  // Source: 49. Corvo
+  DISTRICT_CORVO = 30;
+}

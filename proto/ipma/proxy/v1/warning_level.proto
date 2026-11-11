@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// IPMA warning colours; green is meaningful and distinct from missing.
+enum WarningLevel {
+  WARNING_LEVEL_UNSPECIFIED = 0;
+  WARNING_LEVEL_GREEN = 1;
+  WARNING_LEVEL_YELLOW = 2;
+  WARNING_LEVEL_ORANGE = 3;
+  WARNING_LEVEL_RED = 4;
+  // A present upstream value outside the currently recognised vocabulary.
+  WARNING_LEVEL_OTHER = 5;
+}

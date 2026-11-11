@@ -1,0 +1,467 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/meteorology/stations/stations.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// A partial snapshot, not a closed set. The source-ID suffix disambiguates station names.
+enum Station {
+  STATION_UNSPECIFIED = 0;
+  STATION_OTHER = 1;
+  // Source: 1200501. Flores (Aeródromo)
+  STATION_FLORES_AERODROMO_1200501 = 2;
+  // Source: 1200502. Corvo (Aeródromo)
+  STATION_CORVO_AERODROMO_1200502 = 3;
+  // Source: 1200504. Pico (Aeródromo)
+  STATION_PICO_AERODROMO_1200504 = 4;
+  // Source: 1200505. Horta / Aeroporto
+  STATION_HORTA_AEROPORTO_1200505 = 5;
+  // Source: 1200506. Horta (Obs. Principe Alberto)
+  STATION_HORTA_OBS_PRINCIPE_ALBERTO_1200506 = 6;
+  // Source: 1200507. Graciosa (Aeródromo)
+  STATION_GRACIOSA_AERODROMO_1200507 = 7;
+  // Source: 1200510. São Jorge
+  STATION_SAO_JORGE_1200510 = 8;
+  // Source: 1200511. Angra do Heroísmo
+  STATION_ANGRA_DO_HEROISMO_1200511 = 9;
+  // Source: 1200512. P. Delgada (Aeródromo)
+  STATION_P_DELGADA_AERODROMO_1200512 = 10;
+  // Source: 1200515. Santa Maria (Aeródromo)
+  STATION_SANTA_MARIA_AERODROMO_1200515 = 11;
+  // Source: 1200521. Santa Catarina (Aeródromo)
+  STATION_SANTA_CATARINA_AERODROMO_1200521 = 12;
+  // Source: 1200522. Funchal
+  STATION_FUNCHAL_1200522 = 13;
+  // Source: 1200524. Porto Santo
+  STATION_PORTO_SANTO_1200524 = 14;
+  // Source: 1200531. Cabo Carvoeiro
+  STATION_CABO_CARVOEIRO_1200531 = 15;
+  // Source: 1200533. Sagres
+  STATION_SAGRES_1200533 = 16;
+  // Source: 1200535. Lisboa (Geofísico)
+  STATION_LISBOA_GEOFISICO_1200535 = 17;
+  // Source: 1200541. Sines
+  STATION_SINES_1200541 = 18;
+  // Source: 1200545. Porto, Pedras Rubras (Aeródromo)
+  STATION_PORTO_PEDRAS_RUBRAS_AERODROMO_1200545 = 19;
+  // Source: 1200548. Coimbra (Aeródromo)
+  STATION_COIMBRA_AERODROMO_1200548 = 20;
+  // Source: 1200551. Viana Castelo, Chafé
+  STATION_VIANA_CASTELO_CHAFE_1200551 = 21;
+  // Source: 1200554. Faro (Aeródromo)
+  STATION_FARO_AERODROMO_1200554 = 22;
+  // Source: 1200558. Évora (C.Coordenação)
+  STATION_EVORA_C_COORDENACAO_1200558 = 23;
+  // Source: 1200559. Viseu (Aeródromo)
+  STATION_VISEU_AERODROMO_1200559 = 24;
+  // Source: 1200560. Viseu (C.Coordenação)
+  STATION_VISEU_C_COORDENACAO_1200560 = 25;
+  // Source: 1200562. Beja
+  STATION_BEJA_1200562 = 26;
+  // Source: 1200567. Vila Real
+  STATION_VILA_REAL_1200567 = 27;
+  // Source: 1200568. Penhas Douradas
+  STATION_PENHAS_DOURADAS_1200568 = 28;
+  // Source: 1200570. Castelo Branco
+  STATION_CASTELO_BRANCO_1200570 = 29;
+  // Source: 1200571. Portalegre
+  STATION_PORTALEGRE_1200571 = 30;
+  // Source: 1200575. Bragança
+  STATION_BRAGANCA_1200575 = 31;
+  // Source: 1200576. Bragança (Aeródromo)
+  STATION_BRAGANCA_AERODROMO_1200576 = 32;
+  // Source: 1200843. Évora (Aeródromo)
+  STATION_EVORA_AERODROMO_1200843 = 33;
+  // Source: 1210513. P. Delgada (Obs. A. Chaves)
+  STATION_P_DELGADA_OBS_A_CHAVES_1210513 = 34;
+  // Source: 1210517. Flores / Morro Alto
+  STATION_FLORES_MORRO_ALTO_1210517 = 35;
+  // Source: 1210518. São Miguel - Pico Santos De Cima
+  STATION_SAO_MIGUEL_PICO_SANTOS_DE_CIMA_1210518 = 36;
+  // Source: 1210520. Ilhas selvagens
+  STATION_ILHAS_SELVAGENS_1210520 = 37;
+  // Source: 1210550. Coruche / Cruz Do Leão
+  STATION_CORUCHE_CRUZ_DO_LEAO_1210550 = 38;
+  // Source: 1210553. Loulé / Cavalos De Caldeirão
+  STATION_LOULE_CAVALOS_DE_CALDEIRAO_1210553 = 39;
+  // Source: 1210577. Odemira, S.Teotónio
+  STATION_ODEMIRA_S_TEOTONIO_1210577 = 40;
+  // Source: 1210580. Lisboa, Relógio
+  STATION_LISBOA_RELOGIO_1210580 = 41;
+  // Source: 1210604. V.N.Cerveira (Aeródromo)
+  STATION_V_N_CERVEIRA_AERODROMO_1210604 = 42;
+  // Source: 1210605. Monção, Valinha
+  STATION_MONCAO_VALINHA_1210605 = 43;
+  // Source: 1210606. Lamas de Mouro, P.Ribeiro
+  STATION_LAMAS_DE_MOURO_P_RIBEIRO_1210606 = 44;
+  // Source: 1210611. Montalegre
+  STATION_MONTALEGRE_1210611 = 45;
+  // Source: 1210612. Vinhais
+  STATION_VINHAIS_1210612 = 46;
+  // Source: 1210615. Ponte de Lima
+  STATION_PONTE_DE_LIMA_1210615 = 47;
+  // Source: 1210616. Chaves (Aeródromo)
+  STATION_CHAVES_AERODROMO_1210616 = 48;
+  // Source: 1210619. Cabril
+  STATION_CABRIL_1210619 = 49;
+  // Source: 1210622. Braga, Merelim
+  STATION_BRAGA_MERELIM_1210622 = 50;
+  // Source: 1210625. Guimarães
+  STATION_GUIMARAES_1210625 = 51;
+  // Source: 1210630. Cabeceiras de Basto
+  STATION_CABECEIRAS_DE_BASTO_1210630 = 52;
+  // Source: 1210632. Mirandela
+  STATION_MIRANDELA_1210632 = 53;
+  // Source: 1210633. Macedo Cavaleiros, Bagueixe
+  STATION_MACEDO_CAVALEIROS_BAGUEIXE_1210633 = 54;
+  // Source: 1210635. Miranda do Douro
+  STATION_MIRANDA_DO_DOURO_1210635 = 55;
+  // Source: 1210637. Mogadouro
+  STATION_MOGADOURO_1210637 = 56;
+  // Source: 1210643. Paços Ferreira
+  STATION_PACOS_FERREIRA_1210643 = 57;
+  // Source: 1210644. Carrazêda de Ansiães
+  STATION_CARRAZEDA_DE_ANSIAES_1210644 = 58;
+  // Source: 1210649. S. Gens
+  STATION_S_GENS_1210649 = 59;
+  // Source: 1210654. Moncorvo
+  STATION_MONCORVO_1210654 = 60;
+  // Source: 1210655. Pinhão, Santa Bárbara
+  STATION_PINHAO_SANTA_BARBARA_1210655 = 61;
+  // Source: 1210657. Luzim
+  STATION_LUZIM_1210657 = 62;
+  // Source: 1210659. Espinho/Aeródromo
+  STATION_ESPINHO_AERODROMO_1210659 = 63;
+  // Source: 1210663. Moimenta da Beira
+  STATION_MOIMENTA_DA_BEIRA_1210663 = 64;
+  // Source: 1210665. Mêda
+  STATION_MEDA_1210665 = 65;
+  // Source: 1210666. Trancoso, Bandarra
+  STATION_TRANCOSO_BANDARRA_1210666 = 66;
+  // Source: 1210669. Arouca
+  STATION_AROUCA_1210669 = 67;
+  // Source: 1210671. F. Castelo Rodrigo, V.Torpim
+  STATION_F_CASTELO_RODRIGO_V_TORPIM_1210671 = 68;
+  // Source: 1210683. Guarda
+  STATION_GUARDA_1210683 = 69;
+  // Source: 1210685. Nelas
+  STATION_NELAS_1210685 = 70;
+  // Source: 1210686. Pampilhosa da Serra, Fajão
+  STATION_PAMPILHOSA_DA_SERRA_FAJAO_1210686 = 71;
+  // Source: 1210687. Covilhã (Aeródromo)
+  STATION_COVILHA_AERODROMO_1210687 = 72;
+  // Source: 1210690. Aldeia Souto (Q. Lageosa)
+  STATION_ALDEIA_SOUTO_Q_LAGEOSA_1210690 = 73;
+  // Source: 1210697. Lousã (Aeródromo)
+  STATION_LOUSA_AERODROMO_1210697 = 74;
+  // Source: 1210698. Fundão
+  STATION_FUNDAO_1210698 = 75;
+  // Source: 1210702. Aveiro (Universidade)
+  STATION_AVEIRO_UNIVERSIDADE_1210702 = 76;
+  // Source: 1210704. Dunas de Mira
+  STATION_DUNAS_DE_MIRA_1210704 = 77;
+  // Source: 1210705. Anadia
+  STATION_ANADIA_1210705 = 78;
+  // Source: 1210707. Coimbra, Bencanta
+  STATION_COIMBRA_BENCANTA_1210707 = 79;
+  // Source: 1210713. Figueira da Foz, Vila Verde
+  STATION_FIGUEIRA_DA_FOZ_VILA_VERDE_1210713 = 80;
+  // Source: 1210716. Ansião
+  STATION_ANSIAO_1210716 = 81;
+  // Source: 1210718. Leiria (Aeródromo)
+  STATION_LEIRIA_AERODROMO_1210718 = 82;
+  // Source: 1210721. São Pedro de Moel
+  STATION_SAO_PEDRO_DE_MOEL_1210721 = 83;
+  // Source: 1210723. Ourém / Fátima
+  STATION_OUREM_FATIMA_1210723 = 84;
+  // Source: 1210724. Tomar, Valdonas
+  STATION_TOMAR_VALDONAS_1210724 = 85;
+  // Source: 1210726. Alcobaça
+  STATION_ALCOBACA_1210726 = 86;
+  // Source: 1210729. Rio Maior
+  STATION_RIO_MAIOR_1210729 = 87;
+  // Source: 1210734. Santarém, Fonte Boa
+  STATION_SANTAREM_FONTE_BOA_1210734 = 88;
+  // Source: 1210735. Chamusca / Chouto
+  STATION_CHAMUSCA_CHOUTO_1210735 = 89;
+  // Source: 1210739. Torres Vedras, Dois Portos
+  STATION_TORRES_VEDRAS_DOIS_PORTOS_1210739 = 90;
+  // Source: 1210744. Coruche
+  STATION_CORUCHE_1210744 = 91;
+  // Source: 1210746. Santa Cruz (Aeródromo)
+  STATION_SANTA_CRUZ_AERODROMO_1210746 = 92;
+  // Source: 1210747. Sintra, Colares
+  STATION_SINTRA_COLARES_1210747 = 93;
+  // Source: 1210750. Cabo da Roca
+  STATION_CABO_DA_ROCA_1210750 = 94;
+  // Source: 1210752. Sintra/Tapada do Mouco
+  STATION_SINTRA_TAPADA_DO_MOUCO_1210752 = 95;
+  // Source: 1210762. Lisboa, Tapada da Ajuda
+  STATION_LISBOA_TAPADA_DA_AJUDA_1210762 = 96;
+  // Source: 1210765. Cabo Raso
+  STATION_CABO_RASO_1210765 = 97;
+  // Source: 1210766. Barreiro, Lavradio
+  STATION_BARREIRO_LAVRADIO_1210766 = 98;
+  // Source: 1210767. Pegões
+  STATION_PEGOES_1210767 = 99;
+  // Source: 1210770. Setúbal
+  STATION_SETUBAL_1210770 = 100;
+  // Source: 1210773. Almada, P.Rainha
+  STATION_ALMADA_P_RAINHA_1210773 = 101;
+  // Source: 1210776. Alcácer do Sal, Barrosinha
+  STATION_ALCACER_DO_SAL_BARROSINHA_1210776 = 102;
+  // Source: 1210782. Odemira - Vila Nova de Milfontes
+  STATION_ODEMIRA_VILA_NOVA_DE_MILFONTES_1210782 = 103;
+  // Source: 1210783. Alvalade
+  STATION_ALVALADE_1210783 = 104;
+  // Source: 1210785. Ourique / Santana Da Serra
+  STATION_OURIQUE_SANTANA_DA_SERRA_1210785 = 105;
+  // Source: 1210787. Odemira - Sabóia
+  STATION_ODEMIRA_SABOIA_1210787 = 106;
+  // Source: 1210788. Zambujeira
+  STATION_ZAMBUJEIRA_1210788 = 107;
+  // Source: 1210789. Aljezur
+  STATION_ALJEZUR_1210789 = 108;
+  // Source: 1210790. Fóia
+  STATION_FOIA_1210790 = 109;
+  // Source: 1210791. Aljezur - Rogil
+  STATION_ALJEZUR_ROGIL_1210791 = 110;
+  // Source: 1210793. Silves - São Marcos da Serra
+  STATION_SILVES_SAO_MARCOS_DA_SERRA_1210793 = 111;
+  // Source: 1210800. Sabugal, Martim Rei
+  STATION_SABUGAL_MARTIM_REI_1210800 = 112;
+  // Source: 1210803. Zebreira
+  STATION_ZEBREIRA_1210803 = 113;
+  // Source: 1210806. Proença-a-Nova, P.Moitas
+  STATION_PROENCA_A_NOVA_P_MOITAS_1210806 = 114;
+  // Source: 1210812. Alvega
+  STATION_ALVEGA_1210812 = 115;
+  // Source: 1210824. Avis, Benavila
+  STATION_AVIS_BENAVILA_1210824 = 116;
+  // Source: 1210826. Mora
+  STATION_MORA_1210826 = 117;
+  // Source: 1210835. Elvas
+  STATION_ELVAS_1210835 = 118;
+  // Source: 1210837. Estremoz
+  STATION_ESTREMOZ_1210837 = 119;
+  // Source: 1210840. Reguengos, S. P. do Corval
+  STATION_REGUENGOS_S_P_DO_CORVAL_1210840 = 120;
+  // Source: 1210846. Montemor-O-Novo
+  STATION_MONTEMOR_O_NOVO_1210846 = 121;
+  // Source: 1210847. Viana do Alentejo
+  STATION_VIANA_DO_ALENTEJO_1210847 = 122;
+  // Source: 1210848. Portel, Oriola
+  STATION_PORTEL_ORIOLA_1210848 = 123;
+  // Source: 1210851. Amareleja
+  STATION_AMARELEJA_1210851 = 124;
+  // Source: 1210861. Almodôvar - Pico do Mu
+  STATION_ALMODOVAR_PICO_DO_MU_1210861 = 125;
+  // Source: 1210863. Mértola, Vale Formoso
+  STATION_MERTOLA_VALE_FORMOSO_1210863 = 126;
+  // Source: 1210864. Castro Verde, N.Corvo
+  STATION_CASTRO_VERDE_N_CORVO_1210864 = 127;
+  // Source: 1210865. Alcoutim, Mart.Longo
+  STATION_ALCOUTIM_MART_LONGO_1210865 = 128;
+  // Source: 1210866. Vila Real de S. António
+  STATION_VILA_REAL_DE_S_ANTONIO_1210866 = 129;
+  // Source: 1210867. Castro Marim (RN Sapal)
+  STATION_CASTRO_MARIM_RN_SAPAL_1210867 = 130;
+  // Source: 1210874. Albufeira
+  STATION_ALBUFEIRA_1210874 = 131;
+  // Source: 1210878. Portimão (Aeródromo)
+  STATION_PORTIMAO_AERODROMO_1210878 = 132;
+  // Source: 1210881. Olhão, EPPO
+  STATION_OLHAO_EPPO_1210881 = 133;
+  // Source: 1210883. Tavira
+  STATION_TAVIRA_1210883 = 134;
+  // Source: 1210907. Faja / Ilha das Flores
+  STATION_FAJA_ILHA_DAS_FLORES_1210907 = 135;
+  // Source: 1210932. S. Miguel, Nordeste
+  STATION_S_MIGUEL_NORDESTE_1210932 = 136;
+  // Source: 1210956. Madeira, Porto Moniz
+  STATION_MADEIRA_PORTO_MONIZ_1210956 = 137;
+  // Source: 1210960. Madeira, S. Jorge, Santana
+  STATION_MADEIRA_S_JORGE_SANTANA_1210960 = 138;
+  // Source: 1210965. Madeira, Santana
+  STATION_MADEIRA_SANTANA_1210965 = 139;
+  // Source: 1210967. Madeira, São Vicente
+  STATION_MADEIRA_SAO_VICENTE_1210967 = 140;
+  // Source: 1210970. Madeira, Bica da Cana
+  STATION_MADEIRA_BICA_DA_CANA_1210970 = 141;
+  // Source: 1210972. Madeira, Pico Alto
+  STATION_MADEIRA_PICO_ALTO_1210972 = 142;
+  // Source: 1210973. Madeira, Areeiro
+  STATION_MADEIRA_AREEIRO_1210973 = 143;
+  // Source: 1210974. Madeira, Pico do Areeiro
+  STATION_MADEIRA_PICO_DO_AREEIRO_1210974 = 144;
+  // Source: 1210975. Madeira, Santo da Serra
+  STATION_MADEIRA_SANTO_DA_SERRA_1210975 = 145;
+  // Source: 1210976. Madeira, Monte
+  STATION_MADEIRA_MONTE_1210976 = 146;
+  // Source: 1210977. Madeira, Cancela
+  STATION_MADEIRA_CANCELA_1210977 = 147;
+  // Source: 1210978. Madeira, S. Lourenço
+  STATION_MADEIRA_S_LOURENCO_1210978 = 148;
+  // Source: 1210980. Madeira, Lombo da Terça
+  STATION_MADEIRA_LOMBO_DA_TERCA_1210980 = 149;
+  // Source: 1210984. Madeira, Quinta Grande
+  STATION_MADEIRA_QUINTA_GRANDE_1210984 = 150;
+  // Source: 1210986. Ponta do Sol/Lugar de Baixo
+  STATION_PONTA_DO_SOL_LUGAR_DE_BAIXO_1210986 = 151;
+  // Source: 1210987. Prazeres (Calheta)
+  STATION_PRAZERES_CALHETA_1210987 = 152;
+  // Source: 1210990. Madeira, Calheta
+  STATION_MADEIRA_CALHETA_1210990 = 153;
+  // Source: 1240546. Porto, Serra do Pilar
+  STATION_PORTO_SERRA_DO_PILAR_1240546 = 154;
+  // Source: 1240566. Vila Real (Cidade)
+  STATION_VILA_REAL_CIDADE_1240566 = 155;
+  // Source: 1240610. Viana do Castelo
+  STATION_VIANA_DO_CASTELO_1240610 = 156;
+  // Source: 1240675. Viseu (Cidade)
+  STATION_VISEU_CIDADE_1240675 = 157;
+  // Source: 1240820. Portalegre (cidade)
+  STATION_PORTALEGRE_CIDADE_1240820 = 158;
+  // Source: 1240903. Porto, Massarelos
+  STATION_PORTO_MASSARELOS_1240903 = 159;
+  // Source: 1240916. Leiria
+  STATION_LEIRIA_1240916 = 160;
+  // Source: 1240929. Setúbal, Areias
+  STATION_SETUBAL_AREIAS_1240929 = 161;
+  // Source: 1240935. Amadora
+  STATION_AMADORA_1240935 = 162;
+  // Source: 1240971. Madeira, Funchal, Lido
+  STATION_MADEIRA_FUNCHAL_LIDO_1240971 = 163;
+  // Source: 1259201. Lousã/Trevim
+  STATION_LOUSA_TREVIM_1259201 = 164;
+  // Source: 1259202. Lousã/Candal
+  STATION_LOUSA_CANDAL_1259202 = 165;
+  // Source: 1259203. Seia/Aeródromo
+  STATION_SEIA_AERODROMO_1259203 = 166;
+  // Source: 1259204. Seia/Senhora do Espinheiro
+  STATION_SEIA_SENHORA_DO_ESPINHEIRO_1259204 = 167;
+  // Source: 5210758. Alcochete / Campo Tiro
+  STATION_ALCOCHETE_CAMPO_TIRO_5210758 = 168;
+  // Source: 6210817. Ponte de Sôr / Aeródromo
+  STATION_PONTE_DE_SOR_AERODROMO_6210817 = 169;
+  // Source: 6210872. Loulé (CML)
+  STATION_LOULE_CML_6210872 = 170;
+  // Source: 6210879. Portimão (Praia da Rocha)
+  STATION_PORTIMAO_PRAIA_DA_ROCHA_6210879 = 171;
+  // Source: 6211211. Monção - Guimil (CIM)
+  STATION_MONCAO_GUIMIL_CIM_6211211 = 172;
+  // Source: 6211212. Vila Nova De Cerveira- Alto Pena (CIM)
+  STATION_VILA_NOVA_DE_CERVEIRA_ALTO_PENA_CIM_6211212 = 173;
+  // Source: 6211213. Paredes De Coura - Vascões (CIM)
+  STATION_PAREDES_DE_COURA_VASCOES_CIM_6211213 = 174;
+  // Source: 6211214. Ponte Da Barca - Lindoso (CIM)
+  STATION_PONTE_DA_BARCA_LINDOSO_CIM_6211214 = 175;
+  // Source: 6211215. Caminha - Agra De Baixo (CIM)
+  STATION_CAMINHA_AGRA_DE_BAIXO_CIM_6211215 = 176;
+  // Source: 6211216. Arcos De Valdevez - Heliporto (CIM)
+  STATION_ARCOS_DE_VALDEVEZ_HELIPORTO_CIM_6211216 = 177;
+  // Source: 6211217. Viana Do Castelo - Fonte Louçã (CIM)
+  STATION_VIANA_DO_CASTELO_FONTE_LOUCA_CIM_6211217 = 178;
+  // Source: 6211218. Ponte De Lima - Anais (CIM)
+  STATION_PONTE_DE_LIMA_ANAIS_CIM_6211218 = 179;
+  // Source: 6212121. Terras de Bouro/Barral (CIM)
+  STATION_TERRAS_DE_BOURO_BARRAL_CIM_6212121 = 180;
+  // Source: 6212122. Amares Caldelas (CIM)
+  STATION_AMARES_CALDELAS_CIM_6212122 = 181;
+  // Source: 6212123. Vila Verde (CIM)
+  STATION_VILA_VERDE_CIM_6212123 = 182;
+  // Source: 6212124. Braga (CIM)
+  STATION_BRAGA_CIM_6212124 = 183;
+  // Source: 6212125. Barcelos (CIM)
+  STATION_BARCELOS_CIM_6212125 = 184;
+  // Source: 6212126. Esposende (CIM)
+  STATION_ESPOSENDE_CIM_6212126 = 185;
+  // Source: 6212410. Vila Nova Famalicão (CIM)
+  STATION_VILA_NOVA_FAMALICAO_CIM_6212410 = 186;
+  // Source: 6213011. Aguiar da Beira (CIM)
+  STATION_AGUIAR_DA_BEIRA_CIM_6213011 = 187;
+  // Source: 6213012. Carregal do Sal (CIM)
+  STATION_CARREGAL_DO_SAL_CIM_6213012 = 188;
+  // Source: 6213013. Castro Daire / Mézio (CIM)
+  STATION_CASTRO_DAIRE_MEZIO_CIM_6213013 = 189;
+  // Source: 6213014. Mangualde / Chãs de Tavares  (CIM)
+  STATION_MANGUALDE_CHAS_DE_TAVARES_CIM_6213014 = 190;
+  // Source: 6213015. Nelas / Vilar Seco (CIM)
+  STATION_NELAS_VILAR_SECO_CIM_6213015 = 191;
+  // Source: 6213016. Oliveira de Frades (CIM)
+  STATION_OLIVEIRA_DE_FRADES_CIM_6213016 = 192;
+  // Source: 6213017. Penalva do Castelo (CIM)
+  STATION_PENALVA_DO_CASTELO_CIM_6213017 = 193;
+  // Source: 6213018. São Pedro do Sul (CIM)
+  STATION_SAO_PEDRO_DO_SUL_CIM_6213018 = 194;
+  // Source: 6213019. Santa Comba Dão (CIM)
+  STATION_SANTA_COMBA_DAO_CIM_6213019 = 195;
+  // Source: 6213020. Satão (CIM)
+  STATION_SATAO_CIM_6213020 = 196;
+  // Source: 6213021. Tondela, Caramulinho (CIM)
+  STATION_TONDELA_CARAMULINHO_CIM_6213021 = 197;
+  // Source: 6213022. Vila Nova de Paiva (CIM)
+  STATION_VILA_NOVA_DE_PAIVA_CIM_6213022 = 198;
+  // Source: 6213023. Vouzela (CIM)
+  STATION_VOUZELA_CIM_6213023 = 199;
+  // Source: 6213024. Viseu / Torredeita (CIM)
+  STATION_VISEU_TORREDEITA_CIM_6213024 = 200;
+  // Source: 6213611. Arganil / Aeródromo (CIM)
+  STATION_ARGANIL_AERODROMO_CIM_6213611 = 201;
+  // Source: 6213612. Cantanhede / Fonte Dom Pedro (CIM)
+  STATION_CANTANHEDE_FONTE_DOM_PEDRO_CIM_6213612 = 202;
+  // Source: 6213613. Coimbra / Mata de São Pedro (CIM)
+  STATION_COIMBRA_MATA_DE_SAO_PEDRO_CIM_6213613 = 203;
+  // Source: 6213614. Góis / Quinta da Ribeira (CIM)
+  STATION_GOIS_QUINTA_DA_RIBEIRA_CIM_6213614 = 204;
+  // Source: 6213615. Mealhada / Quinta do Vale (CIM)
+  STATION_MEALHADA_QUINTA_DO_VALE_CIM_6213615 = 205;
+  // Source: 6213616. Mortágua / Aeródromo (CIM)
+  STATION_MORTAGUA_AERODROMO_CIM_6213616 = 206;
+  // Source: 6213617. Penacova / Hombres (CIM)
+  STATION_PENACOVA_HOMBRES_CIM_6213617 = 207;
+  // Source: 6213618. Penela / Serra do Espinhal (CIM)
+  STATION_PENELA_SERRA_DO_ESPINHAL_CIM_6213618 = 208;
+  // Source: 6213619. Vila Nova de Poiares (CIM)
+  STATION_VILA_NOVA_DE_POIARES_CIM_6213619 = 209;
+  // Source: 6213620. Oliveira do Hospital (CIM)
+  STATION_OLIVEIRA_DO_HOSPITAL_CIM_6213620 = 210;
+  // Source: 6213621. Soure (CIM)
+  STATION_SOURE_CIM_6213621 = 211;
+  // Source: 6214119. Pedrógão Grande (CMPG)
+  STATION_PEDROGAO_GRANDE_CMPG_6214119 = 212;
+  // Source: 6215302. Lisboa, Carnide (CML)
+  STATION_LISBOA_CARNIDE_CML_6215302 = 213;
+  // Source: 6215360. Oeiras / Vila Fria (CMO)
+  STATION_OEIRAS_VILA_FRIA_CMO_6215360 = 214;
+  // Source: 7240919. Lisboa, Amoreiras (LFCL)
+  STATION_LISBOA_AMOREIRAS_LFCL_7240919 = 215;
+  // Source: 11217160. Santa Maria / Praia Formosa (DROTRH)
+  STATION_SANTA_MARIA_PRAIA_FORMOSA_DROTRH_11217160 = 216;
+  // Source: 11217165. Santa Maria / Maia (DROTRH)
+  STATION_SANTA_MARIA_MAIA_DROTRH_11217165 = 217;
+  // Source: 11217217. São Miguel / Santana (DROTRH)
+  STATION_SAO_MIGUEL_SANTANA_DROTRH_11217217 = 218;
+  // Source: 11217225. São Miguel / Sete Cidades (DROTRH)
+  STATION_SAO_MIGUEL_SETE_CIDADES_DROTRH_11217225 = 219;
+  // Source: 11217255. São Miguel / Lagoa das Furnas (DROTRH)
+  STATION_SAO_MIGUEL_LAGOA_DAS_FURNAS_DROTRH_11217255 = 220;
+  // Source: 11217370. Terceira / Ribeira das Nove (DROTRH)
+  STATION_TERCEIRA_RIBEIRA_DAS_NOVE_DROTRH_11217370 = 221;
+  // Source: 11217372. Terceira / Serra do Cume (DROTRH)
+  STATION_TERCEIRA_SERRA_DO_CUME_DROTRH_11217372 = 222;
+  // Source: 11217430. Graciosa / Serra das Fontes (DROTRH)
+  STATION_GRACIOSA_SERRA_DAS_FONTES_DROTRH_11217430 = 223;
+  // Source: 11217510. São Jorge / Pico do Areeiro (DROTRH)
+  STATION_SAO_JORGE_PICO_DO_AREEIRO_DROTRH_11217510 = 224;
+  // Source: 11217625. Pico / Cabeço do Teicho (DROTRH)
+  STATION_PICO_CABECO_DO_TEICHO_DROTRH_11217625 = 225;
+  // Source: 11217645. Pico / Cabecinho (DROTRH)
+  STATION_PICO_CABECINHO_DROTRH_11217645 = 226;
+  // Source: 11217710. Faial / Alto do Cabouco (DROTRH)
+  STATION_FAIAL_ALTO_DO_CABOUCO_DROTRH_11217710 = 227;
+  // Source: 11217730. Faial / Cabeço Verde (DROTRH)
+  STATION_FAIAL_CABECO_VERDE_DROTRH_11217730 = 228;
+}

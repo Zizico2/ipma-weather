@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/seismic/3.json
+// https://api.ipma.pt/open-data/observation/seismic/7.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Ranges remain distinct enum cases; do not infer a named intensity scale.
+enum SeismicDegree {
+  SEISMIC_DEGREE_UNSPECIFIED = 0;
+  SEISMIC_DEGREE_OTHER = 1;
+  // Source: II. Exact published degree token; scale not specified by this API.
+  SEISMIC_DEGREE_II = 2;
+  // Source: III. Exact published degree token; scale not specified by this API.
+  SEISMIC_DEGREE_III = 3;
+  // Source: III/IV. Exact published degree token; scale not specified by this API.
+  SEISMIC_DEGREE_III_TO_IV = 4;
+  // Source: IV/V. Exact published degree token; scale not specified by this API.
+  SEISMIC_DEGREE_IV_TO_V = 5;
+}

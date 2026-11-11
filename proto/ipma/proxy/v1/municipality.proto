@@ -1,0 +1,594 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/climate/temperature/t2m-p1d-continental-obssup-idw-concelhos-20d.csv
+// Additional island DICO entries: https://api.ipma.pt/open-data/distrits-islands.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Partial catalogue: includes all 278 mainland climate municipalities and island entries
+// identified in the weather catalogue. Other municipalities use OTHER plus their DICO.
+// The DICO suffix distinguishes municipalities with the same name.
+enum Municipality {
+  MUNICIPALITY_UNSPECIFIED = 0;
+  MUNICIPALITY_OTHER = 1;
+  // Source: 0101. Águeda
+  MUNICIPALITY_AGUEDA_0101 = 2;
+  // Source: 0102. Albergaria-a-Velha
+  MUNICIPALITY_ALBERGARIA_A_VELHA_0102 = 3;
+  // Source: 0103. Anadia
+  MUNICIPALITY_ANADIA_0103 = 4;
+  // Source: 0104. Arouca
+  MUNICIPALITY_AROUCA_0104 = 5;
+  // Source: 0105. Aveiro
+  MUNICIPALITY_AVEIRO_0105 = 6;
+  // Source: 0106. Castelo de Paiva
+  MUNICIPALITY_CASTELO_DE_PAIVA_0106 = 7;
+  // Source: 0107. Espinho
+  MUNICIPALITY_ESPINHO_0107 = 8;
+  // Source: 0108. Estarreja
+  MUNICIPALITY_ESTARREJA_0108 = 9;
+  // Source: 0109. Santa Maria da Feira
+  MUNICIPALITY_SANTA_MARIA_DA_FEIRA_0109 = 10;
+  // Source: 0110. Ílhavo
+  MUNICIPALITY_ILHAVO_0110 = 11;
+  // Source: 0111. Mealhada
+  MUNICIPALITY_MEALHADA_0111 = 12;
+  // Source: 0112. Murtosa
+  MUNICIPALITY_MURTOSA_0112 = 13;
+  // Source: 0113. Oliveira de Azeméis
+  MUNICIPALITY_OLIVEIRA_DE_AZEMEIS_0113 = 14;
+  // Source: 0114. Oliveira do Bairro
+  MUNICIPALITY_OLIVEIRA_DO_BAIRRO_0114 = 15;
+  // Source: 0115. Ovar
+  MUNICIPALITY_OVAR_0115 = 16;
+  // Source: 0116. São João da Madeira
+  MUNICIPALITY_SAO_JOAO_DA_MADEIRA_0116 = 17;
+  // Source: 0117. Sever do Vouga
+  MUNICIPALITY_SEVER_DO_VOUGA_0117 = 18;
+  // Source: 0118. Vagos
+  MUNICIPALITY_VAGOS_0118 = 19;
+  // Source: 0119. Vale de Cambra
+  MUNICIPALITY_VALE_DE_CAMBRA_0119 = 20;
+  // Source: 0201. Aljustrel
+  MUNICIPALITY_ALJUSTREL_0201 = 21;
+  // Source: 0202. Almodôvar
+  MUNICIPALITY_ALMODOVAR_0202 = 22;
+  // Source: 0203. Alvito
+  MUNICIPALITY_ALVITO_0203 = 23;
+  // Source: 0204. Barrancos
+  MUNICIPALITY_BARRANCOS_0204 = 24;
+  // Source: 0205. Beja
+  MUNICIPALITY_BEJA_0205 = 25;
+  // Source: 0206. Castro Verde
+  MUNICIPALITY_CASTRO_VERDE_0206 = 26;
+  // Source: 0207. Cuba
+  MUNICIPALITY_CUBA_0207 = 27;
+  // Source: 0208. Ferreira do Alentejo
+  MUNICIPALITY_FERREIRA_DO_ALENTEJO_0208 = 28;
+  // Source: 0209. Mértola
+  MUNICIPALITY_MERTOLA_0209 = 29;
+  // Source: 0210. Moura
+  MUNICIPALITY_MOURA_0210 = 30;
+  // Source: 0211. Odemira
+  MUNICIPALITY_ODEMIRA_0211 = 31;
+  // Source: 0212. Ourique
+  MUNICIPALITY_OURIQUE_0212 = 32;
+  // Source: 0213. Serpa
+  MUNICIPALITY_SERPA_0213 = 33;
+  // Source: 0214. Vidigueira
+  MUNICIPALITY_VIDIGUEIRA_0214 = 34;
+  // Source: 0301. Amares
+  MUNICIPALITY_AMARES_0301 = 35;
+  // Source: 0302. Barcelos
+  MUNICIPALITY_BARCELOS_0302 = 36;
+  // Source: 0303. Braga
+  MUNICIPALITY_BRAGA_0303 = 37;
+  // Source: 0304. Cabeceiras de Basto
+  MUNICIPALITY_CABECEIRAS_DE_BASTO_0304 = 38;
+  // Source: 0305. Celorico de Basto
+  MUNICIPALITY_CELORICO_DE_BASTO_0305 = 39;
+  // Source: 0306. Esposende
+  MUNICIPALITY_ESPOSENDE_0306 = 40;
+  // Source: 0307. Fafe
+  MUNICIPALITY_FAFE_0307 = 41;
+  // Source: 0308. Guimarães
+  MUNICIPALITY_GUIMARAES_0308 = 42;
+  // Source: 0309. Póvoa de Lanhoso
+  MUNICIPALITY_POVOA_DE_LANHOSO_0309 = 43;
+  // Source: 0310. Terras de Bouro
+  MUNICIPALITY_TERRAS_DE_BOURO_0310 = 44;
+  // Source: 0311. Vieira do Minho
+  MUNICIPALITY_VIEIRA_DO_MINHO_0311 = 45;
+  // Source: 0312. Vila Nova de Famalicão
+  MUNICIPALITY_VILA_NOVA_DE_FAMALICAO_0312 = 46;
+  // Source: 0313. Vila Verde
+  MUNICIPALITY_VILA_VERDE_0313 = 47;
+  // Source: 0314. Vizela
+  MUNICIPALITY_VIZELA_0314 = 48;
+  // Source: 0401. Alfândega da Fé
+  MUNICIPALITY_ALFANDEGA_DA_FE_0401 = 49;
+  // Source: 0402. Bragança
+  MUNICIPALITY_BRAGANCA_0402 = 50;
+  // Source: 0403. Carrazeda de Ansiães
+  MUNICIPALITY_CARRAZEDA_DE_ANSIAES_0403 = 51;
+  // Source: 0404. Freixo de Espada à Cinta
+  MUNICIPALITY_FREIXO_DE_ESPADA_A_CINTA_0404 = 52;
+  // Source: 0405. Macedo de Cavaleiros
+  MUNICIPALITY_MACEDO_DE_CAVALEIROS_0405 = 53;
+  // Source: 0406. Miranda do Douro
+  MUNICIPALITY_MIRANDA_DO_DOURO_0406 = 54;
+  // Source: 0407. Mirandela
+  MUNICIPALITY_MIRANDELA_0407 = 55;
+  // Source: 0408. Mogadouro
+  MUNICIPALITY_MOGADOURO_0408 = 56;
+  // Source: 0409. Torre de Moncorvo
+  MUNICIPALITY_TORRE_DE_MONCORVO_0409 = 57;
+  // Source: 0410. Vila Flor
+  MUNICIPALITY_VILA_FLOR_0410 = 58;
+  // Source: 0411. Vimioso
+  MUNICIPALITY_VIMIOSO_0411 = 59;
+  // Source: 0412. Vinhais
+  MUNICIPALITY_VINHAIS_0412 = 60;
+  // Source: 0501. Belmonte
+  MUNICIPALITY_BELMONTE_0501 = 61;
+  // Source: 0502. Castelo Branco
+  MUNICIPALITY_CASTELO_BRANCO_0502 = 62;
+  // Source: 0503. Covilhã
+  MUNICIPALITY_COVILHA_0503 = 63;
+  // Source: 0504. Fundão
+  MUNICIPALITY_FUNDAO_0504 = 64;
+  // Source: 0505. Idanha-a-Nova
+  MUNICIPALITY_IDANHA_A_NOVA_0505 = 65;
+  // Source: 0506. Oleiros
+  MUNICIPALITY_OLEIROS_0506 = 66;
+  // Source: 0507. Penamacor
+  MUNICIPALITY_PENAMACOR_0507 = 67;
+  // Source: 0508. Proença-a-Nova
+  MUNICIPALITY_PROENCA_A_NOVA_0508 = 68;
+  // Source: 0509. Sertã
+  MUNICIPALITY_SERTA_0509 = 69;
+  // Source: 0510. Vila de Rei
+  MUNICIPALITY_VILA_DE_REI_0510 = 70;
+  // Source: 0511. Vila Velha de Ródão
+  MUNICIPALITY_VILA_VELHA_DE_RODAO_0511 = 71;
+  // Source: 0601. Arganil
+  MUNICIPALITY_ARGANIL_0601 = 72;
+  // Source: 0602. Cantanhede
+  MUNICIPALITY_CANTANHEDE_0602 = 73;
+  // Source: 0603. Coimbra
+  MUNICIPALITY_COIMBRA_0603 = 74;
+  // Source: 0604. Condeixa-a-Nova
+  MUNICIPALITY_CONDEIXA_A_NOVA_0604 = 75;
+  // Source: 0605. Figueira da Foz
+  MUNICIPALITY_FIGUEIRA_DA_FOZ_0605 = 76;
+  // Source: 0606. Góis
+  MUNICIPALITY_GOIS_0606 = 77;
+  // Source: 0607. Lousã
+  MUNICIPALITY_LOUSA_0607 = 78;
+  // Source: 0608. Mira
+  MUNICIPALITY_MIRA_0608 = 79;
+  // Source: 0609. Miranda do Corvo
+  MUNICIPALITY_MIRANDA_DO_CORVO_0609 = 80;
+  // Source: 0610. Montemor-o-Velho
+  MUNICIPALITY_MONTEMOR_O_VELHO_0610 = 81;
+  // Source: 0611. Oliveira do Hospital
+  MUNICIPALITY_OLIVEIRA_DO_HOSPITAL_0611 = 82;
+  // Source: 0612. Pampilhosa da Serra
+  MUNICIPALITY_PAMPILHOSA_DA_SERRA_0612 = 83;
+  // Source: 0613. Penacova
+  MUNICIPALITY_PENACOVA_0613 = 84;
+  // Source: 0614. Penela
+  MUNICIPALITY_PENELA_0614 = 85;
+  // Source: 0615. Soure
+  MUNICIPALITY_SOURE_0615 = 86;
+  // Source: 0616. Tábua
+  MUNICIPALITY_TABUA_0616 = 87;
+  // Source: 0617. Vila Nova de Poiares
+  MUNICIPALITY_VILA_NOVA_DE_POIARES_0617 = 88;
+  // Source: 0701. Alandroal
+  MUNICIPALITY_ALANDROAL_0701 = 89;
+  // Source: 0702. Arraiolos
+  MUNICIPALITY_ARRAIOLOS_0702 = 90;
+  // Source: 0703. Borba
+  MUNICIPALITY_BORBA_0703 = 91;
+  // Source: 0704. Estremoz
+  MUNICIPALITY_ESTREMOZ_0704 = 92;
+  // Source: 0705. Évora
+  MUNICIPALITY_EVORA_0705 = 93;
+  // Source: 0706. Montemor-o-Novo
+  MUNICIPALITY_MONTEMOR_O_NOVO_0706 = 94;
+  // Source: 0707. Mora
+  MUNICIPALITY_MORA_0707 = 95;
+  // Source: 0708. Mourão
+  MUNICIPALITY_MOURAO_0708 = 96;
+  // Source: 0709. Portel
+  MUNICIPALITY_PORTEL_0709 = 97;
+  // Source: 0710. Redondo
+  MUNICIPALITY_REDONDO_0710 = 98;
+  // Source: 0711. Reguengos de Monsaraz
+  MUNICIPALITY_REGUENGOS_DE_MONSARAZ_0711 = 99;
+  // Source: 0712. Vendas Novas
+  MUNICIPALITY_VENDAS_NOVAS_0712 = 100;
+  // Source: 0713. Viana do Alentejo
+  MUNICIPALITY_VIANA_DO_ALENTEJO_0713 = 101;
+  // Source: 0714. Vila Viçosa
+  MUNICIPALITY_VILA_VICOSA_0714 = 102;
+  // Source: 0801. Albufeira
+  MUNICIPALITY_ALBUFEIRA_0801 = 103;
+  // Source: 0802. Alcoutim
+  MUNICIPALITY_ALCOUTIM_0802 = 104;
+  // Source: 0803. Aljezur
+  MUNICIPALITY_ALJEZUR_0803 = 105;
+  // Source: 0804. Castro Marim
+  MUNICIPALITY_CASTRO_MARIM_0804 = 106;
+  // Source: 0805. Faro
+  MUNICIPALITY_FARO_0805 = 107;
+  // Source: 0806. Lagoa
+  MUNICIPALITY_LAGOA_0806 = 108;
+  // Source: 0807. Lagos
+  MUNICIPALITY_LAGOS_0807 = 109;
+  // Source: 0808. Loulé
+  MUNICIPALITY_LOULE_0808 = 110;
+  // Source: 0809. Monchique
+  MUNICIPALITY_MONCHIQUE_0809 = 111;
+  // Source: 0810. Olhão
+  MUNICIPALITY_OLHAO_0810 = 112;
+  // Source: 0811. Portimão
+  MUNICIPALITY_PORTIMAO_0811 = 113;
+  // Source: 0812. São Brás de Alportel
+  MUNICIPALITY_SAO_BRAS_DE_ALPORTEL_0812 = 114;
+  // Source: 0813. Silves
+  MUNICIPALITY_SILVES_0813 = 115;
+  // Source: 0814. Tavira
+  MUNICIPALITY_TAVIRA_0814 = 116;
+  // Source: 0815. Vila do Bispo
+  MUNICIPALITY_VILA_DO_BISPO_0815 = 117;
+  // Source: 0816. Vila Real de Santo António
+  MUNICIPALITY_VILA_REAL_DE_SANTO_ANTONIO_0816 = 118;
+  // Source: 0901. Aguiar da Beira
+  MUNICIPALITY_AGUIAR_DA_BEIRA_0901 = 119;
+  // Source: 0902. Almeida
+  MUNICIPALITY_ALMEIDA_0902 = 120;
+  // Source: 0903. Celorico da Beira
+  MUNICIPALITY_CELORICO_DA_BEIRA_0903 = 121;
+  // Source: 0904. Figueira de Castelo Rodrigo
+  MUNICIPALITY_FIGUEIRA_DE_CASTELO_RODRIGO_0904 = 122;
+  // Source: 0905. Fornos de Algodres
+  MUNICIPALITY_FORNOS_DE_ALGODRES_0905 = 123;
+  // Source: 0906. Gouveia
+  MUNICIPALITY_GOUVEIA_0906 = 124;
+  // Source: 0907. Guarda
+  MUNICIPALITY_GUARDA_0907 = 125;
+  // Source: 0908. Manteigas
+  MUNICIPALITY_MANTEIGAS_0908 = 126;
+  // Source: 0909. Mêda
+  MUNICIPALITY_MEDA_0909 = 127;
+  // Source: 0910. Pinhel
+  MUNICIPALITY_PINHEL_0910 = 128;
+  // Source: 0911. Sabugal
+  MUNICIPALITY_SABUGAL_0911 = 129;
+  // Source: 0912. Seia
+  MUNICIPALITY_SEIA_0912 = 130;
+  // Source: 0913. Trancoso
+  MUNICIPALITY_TRANCOSO_0913 = 131;
+  // Source: 0914. Vila Nova de Foz Côa
+  MUNICIPALITY_VILA_NOVA_DE_FOZ_COA_0914 = 132;
+  // Source: 1001. Alcobaça
+  MUNICIPALITY_ALCOBACA_1001 = 133;
+  // Source: 1002. Alvaiázere
+  MUNICIPALITY_ALVAIAZERE_1002 = 134;
+  // Source: 1003. Ansião
+  MUNICIPALITY_ANSIAO_1003 = 135;
+  // Source: 1004. Batalha
+  MUNICIPALITY_BATALHA_1004 = 136;
+  // Source: 1005. Bombarral
+  MUNICIPALITY_BOMBARRAL_1005 = 137;
+  // Source: 1006. Caldas da Rainha
+  MUNICIPALITY_CALDAS_DA_RAINHA_1006 = 138;
+  // Source: 1007. Castanheira de Pêra
+  MUNICIPALITY_CASTANHEIRA_DE_PERA_1007 = 139;
+  // Source: 1008. Figueiró dos Vinhos
+  MUNICIPALITY_FIGUEIRO_DOS_VINHOS_1008 = 140;
+  // Source: 1009. Leiria
+  MUNICIPALITY_LEIRIA_1009 = 141;
+  // Source: 1010. Marinha Grande
+  MUNICIPALITY_MARINHA_GRANDE_1010 = 142;
+  // Source: 1011. Nazaré
+  MUNICIPALITY_NAZARE_1011 = 143;
+  // Source: 1012. Óbidos
+  MUNICIPALITY_OBIDOS_1012 = 144;
+  // Source: 1013. Pedrógão Grande
+  MUNICIPALITY_PEDROGAO_GRANDE_1013 = 145;
+  // Source: 1014. Peniche
+  MUNICIPALITY_PENICHE_1014 = 146;
+  // Source: 1015. Pombal
+  MUNICIPALITY_POMBAL_1015 = 147;
+  // Source: 1016. Porto de Mós
+  MUNICIPALITY_PORTO_DE_MOS_1016 = 148;
+  // Source: 1101. Alenquer
+  MUNICIPALITY_ALENQUER_1101 = 149;
+  // Source: 1102. Arruda dos Vinhos
+  MUNICIPALITY_ARRUDA_DOS_VINHOS_1102 = 150;
+  // Source: 1103. Azambuja
+  MUNICIPALITY_AZAMBUJA_1103 = 151;
+  // Source: 1104. Cadaval
+  MUNICIPALITY_CADAVAL_1104 = 152;
+  // Source: 1105. Cascais
+  MUNICIPALITY_CASCAIS_1105 = 153;
+  // Source: 1106. Lisboa
+  MUNICIPALITY_LISBOA_1106 = 154;
+  // Source: 1107. Loures
+  MUNICIPALITY_LOURES_1107 = 155;
+  // Source: 1108. Lourinhã
+  MUNICIPALITY_LOURINHA_1108 = 156;
+  // Source: 1109. Mafra
+  MUNICIPALITY_MAFRA_1109 = 157;
+  // Source: 1110. Oeiras
+  MUNICIPALITY_OEIRAS_1110 = 158;
+  // Source: 1111. Sintra
+  MUNICIPALITY_SINTRA_1111 = 159;
+  // Source: 1112. Sobral de Monte Agraço
+  MUNICIPALITY_SOBRAL_DE_MONTE_AGRACO_1112 = 160;
+  // Source: 1113. Torres Vedras
+  MUNICIPALITY_TORRES_VEDRAS_1113 = 161;
+  // Source: 1114. Vila Franca de Xira
+  MUNICIPALITY_VILA_FRANCA_DE_XIRA_1114 = 162;
+  // Source: 1115. Amadora
+  MUNICIPALITY_AMADORA_1115 = 163;
+  // Source: 1116. Odivelas
+  MUNICIPALITY_ODIVELAS_1116 = 164;
+  // Source: 1201. Alter do Chão
+  MUNICIPALITY_ALTER_DO_CHAO_1201 = 165;
+  // Source: 1202. Arronches
+  MUNICIPALITY_ARRONCHES_1202 = 166;
+  // Source: 1203. Avis
+  MUNICIPALITY_AVIS_1203 = 167;
+  // Source: 1204. Campo Maior
+  MUNICIPALITY_CAMPO_MAIOR_1204 = 168;
+  // Source: 1205. Castelo de Vide
+  MUNICIPALITY_CASTELO_DE_VIDE_1205 = 169;
+  // Source: 1206. Crato
+  MUNICIPALITY_CRATO_1206 = 170;
+  // Source: 1207. Elvas
+  MUNICIPALITY_ELVAS_1207 = 171;
+  // Source: 1208. Fronteira
+  MUNICIPALITY_FRONTEIRA_1208 = 172;
+  // Source: 1209. Gavião
+  MUNICIPALITY_GAVIAO_1209 = 173;
+  // Source: 1210. Marvão
+  MUNICIPALITY_MARVAO_1210 = 174;
+  // Source: 1211. Monforte
+  MUNICIPALITY_MONFORTE_1211 = 175;
+  // Source: 1212. Nisa
+  MUNICIPALITY_NISA_1212 = 176;
+  // Source: 1213. Ponte de Sor
+  MUNICIPALITY_PONTE_DE_SOR_1213 = 177;
+  // Source: 1214. Portalegre
+  MUNICIPALITY_PORTALEGRE_1214 = 178;
+  // Source: 1215. Sousel
+  MUNICIPALITY_SOUSEL_1215 = 179;
+  // Source: 1301. Amarante
+  MUNICIPALITY_AMARANTE_1301 = 180;
+  // Source: 1302. Baião
+  MUNICIPALITY_BAIAO_1302 = 181;
+  // Source: 1303. Felgueiras
+  MUNICIPALITY_FELGUEIRAS_1303 = 182;
+  // Source: 1304. Gondomar
+  MUNICIPALITY_GONDOMAR_1304 = 183;
+  // Source: 1305. Lousada
+  MUNICIPALITY_LOUSADA_1305 = 184;
+  // Source: 1306. Maia
+  MUNICIPALITY_MAIA_1306 = 185;
+  // Source: 1307. Marco de Canaveses
+  MUNICIPALITY_MARCO_DE_CANAVESES_1307 = 186;
+  // Source: 1308. Matosinhos
+  MUNICIPALITY_MATOSINHOS_1308 = 187;
+  // Source: 1309. Paços de Ferreira
+  MUNICIPALITY_PACOS_DE_FERREIRA_1309 = 188;
+  // Source: 1310. Paredes
+  MUNICIPALITY_PAREDES_1310 = 189;
+  // Source: 1311. Penafiel
+  MUNICIPALITY_PENAFIEL_1311 = 190;
+  // Source: 1312. Porto
+  MUNICIPALITY_PORTO_1312 = 191;
+  // Source: 1313. Póvoa de Varzim
+  MUNICIPALITY_POVOA_DE_VARZIM_1313 = 192;
+  // Source: 1314. Santo Tirso
+  MUNICIPALITY_SANTO_TIRSO_1314 = 193;
+  // Source: 1315. Valongo
+  MUNICIPALITY_VALONGO_1315 = 194;
+  // Source: 1316. Vila do Conde
+  MUNICIPALITY_VILA_DO_CONDE_1316 = 195;
+  // Source: 1317. Vila Nova de Gaia
+  MUNICIPALITY_VILA_NOVA_DE_GAIA_1317 = 196;
+  // Source: 1318. Trofa
+  MUNICIPALITY_TROFA_1318 = 197;
+  // Source: 1401. Abrantes
+  MUNICIPALITY_ABRANTES_1401 = 198;
+  // Source: 1402. Alcanena
+  MUNICIPALITY_ALCANENA_1402 = 199;
+  // Source: 1403. Almeirim
+  MUNICIPALITY_ALMEIRIM_1403 = 200;
+  // Source: 1404. Alpiarça
+  MUNICIPALITY_ALPIARCA_1404 = 201;
+  // Source: 1405. Benavente
+  MUNICIPALITY_BENAVENTE_1405 = 202;
+  // Source: 1406. Cartaxo
+  MUNICIPALITY_CARTAXO_1406 = 203;
+  // Source: 1407. Chamusca
+  MUNICIPALITY_CHAMUSCA_1407 = 204;
+  // Source: 1408. Constância
+  MUNICIPALITY_CONSTANCIA_1408 = 205;
+  // Source: 1409. Coruche
+  MUNICIPALITY_CORUCHE_1409 = 206;
+  // Source: 1410. Entroncamento
+  MUNICIPALITY_ENTRONCAMENTO_1410 = 207;
+  // Source: 1411. Ferreira do Zêzere
+  MUNICIPALITY_FERREIRA_DO_ZEZERE_1411 = 208;
+  // Source: 1412. Golegã
+  MUNICIPALITY_GOLEGA_1412 = 209;
+  // Source: 1413. Mação
+  MUNICIPALITY_MACAO_1413 = 210;
+  // Source: 1414. Rio Maior
+  MUNICIPALITY_RIO_MAIOR_1414 = 211;
+  // Source: 1415. Salvaterra de Magos
+  MUNICIPALITY_SALVATERRA_DE_MAGOS_1415 = 212;
+  // Source: 1416. Santarém
+  MUNICIPALITY_SANTAREM_1416 = 213;
+  // Source: 1417. Sardoal
+  MUNICIPALITY_SARDOAL_1417 = 214;
+  // Source: 1418. Tomar
+  MUNICIPALITY_TOMAR_1418 = 215;
+  // Source: 1419. Torres Novas
+  MUNICIPALITY_TORRES_NOVAS_1419 = 216;
+  // Source: 1420. Vila Nova da Barquinha
+  MUNICIPALITY_VILA_NOVA_DA_BARQUINHA_1420 = 217;
+  // Source: 1421. Ourém
+  MUNICIPALITY_OUREM_1421 = 218;
+  // Source: 1501. Alcácer do Sal
+  MUNICIPALITY_ALCACER_DO_SAL_1501 = 219;
+  // Source: 1502. Alcochete
+  MUNICIPALITY_ALCOCHETE_1502 = 220;
+  // Source: 1503. Almada
+  MUNICIPALITY_ALMADA_1503 = 221;
+  // Source: 1504. Barreiro
+  MUNICIPALITY_BARREIRO_1504 = 222;
+  // Source: 1505. Grândola
+  MUNICIPALITY_GRANDOLA_1505 = 223;
+  // Source: 1506. Moita
+  MUNICIPALITY_MOITA_1506 = 224;
+  // Source: 1507. Montijo
+  MUNICIPALITY_MONTIJO_1507 = 225;
+  // Source: 1508. Palmela
+  MUNICIPALITY_PALMELA_1508 = 226;
+  // Source: 1509. Santiago do Cacém
+  MUNICIPALITY_SANTIAGO_DO_CACEM_1509 = 227;
+  // Source: 1510. Seixal
+  MUNICIPALITY_SEIXAL_1510 = 228;
+  // Source: 1511. Sesimbra
+  MUNICIPALITY_SESIMBRA_1511 = 229;
+  // Source: 1512. Setúbal
+  MUNICIPALITY_SETUBAL_1512 = 230;
+  // Source: 1513. Sines
+  MUNICIPALITY_SINES_1513 = 231;
+  // Source: 1601. Arcos de Valdevez
+  MUNICIPALITY_ARCOS_DE_VALDEVEZ_1601 = 232;
+  // Source: 1602. Caminha
+  MUNICIPALITY_CAMINHA_1602 = 233;
+  // Source: 1603. Melgaço
+  MUNICIPALITY_MELGACO_1603 = 234;
+  // Source: 1604. Monção
+  MUNICIPALITY_MONCAO_1604 = 235;
+  // Source: 1605. Paredes de Coura
+  MUNICIPALITY_PAREDES_DE_COURA_1605 = 236;
+  // Source: 1606. Ponte da Barca
+  MUNICIPALITY_PONTE_DA_BARCA_1606 = 237;
+  // Source: 1607. Ponte de Lima
+  MUNICIPALITY_PONTE_DE_LIMA_1607 = 238;
+  // Source: 1608. Valença
+  MUNICIPALITY_VALENCA_1608 = 239;
+  // Source: 1609. Viana do Castelo
+  MUNICIPALITY_VIANA_DO_CASTELO_1609 = 240;
+  // Source: 1610. Vila Nova de Cerveira
+  MUNICIPALITY_VILA_NOVA_DE_CERVEIRA_1610 = 241;
+  // Source: 1701. Alijó
+  MUNICIPALITY_ALIJO_1701 = 242;
+  // Source: 1702. Boticas
+  MUNICIPALITY_BOTICAS_1702 = 243;
+  // Source: 1703. Chaves
+  MUNICIPALITY_CHAVES_1703 = 244;
+  // Source: 1704. Mesão Frio
+  MUNICIPALITY_MESAO_FRIO_1704 = 245;
+  // Source: 1705. Mondim de Basto
+  MUNICIPALITY_MONDIM_DE_BASTO_1705 = 246;
+  // Source: 1706. Montalegre
+  MUNICIPALITY_MONTALEGRE_1706 = 247;
+  // Source: 1707. Murça
+  MUNICIPALITY_MURCA_1707 = 248;
+  // Source: 1708. Peso da Régua
+  MUNICIPALITY_PESO_DA_REGUA_1708 = 249;
+  // Source: 1709. Ribeira de Pena
+  MUNICIPALITY_RIBEIRA_DE_PENA_1709 = 250;
+  // Source: 1710. Sabrosa
+  MUNICIPALITY_SABROSA_1710 = 251;
+  // Source: 1711. Santa Marta de Penaguião
+  MUNICIPALITY_SANTA_MARTA_DE_PENAGUIAO_1711 = 252;
+  // Source: 1712. Valpaços
+  MUNICIPALITY_VALPACOS_1712 = 253;
+  // Source: 1713. Vila Pouca de Aguiar
+  MUNICIPALITY_VILA_POUCA_DE_AGUIAR_1713 = 254;
+  // Source: 1714. Vila Real
+  MUNICIPALITY_VILA_REAL_1714 = 255;
+  // Source: 1801. Armamar
+  MUNICIPALITY_ARMAMAR_1801 = 256;
+  // Source: 1802. Carregal do Sal
+  MUNICIPALITY_CARREGAL_DO_SAL_1802 = 257;
+  // Source: 1803. Castro Daire
+  MUNICIPALITY_CASTRO_DAIRE_1803 = 258;
+  // Source: 1804. Cinfães
+  MUNICIPALITY_CINFAES_1804 = 259;
+  // Source: 1805. Lamego
+  MUNICIPALITY_LAMEGO_1805 = 260;
+  // Source: 1806. Mangualde
+  MUNICIPALITY_MANGUALDE_1806 = 261;
+  // Source: 1807. Moimenta da Beira
+  MUNICIPALITY_MOIMENTA_DA_BEIRA_1807 = 262;
+  // Source: 1808. Mortágua
+  MUNICIPALITY_MORTAGUA_1808 = 263;
+  // Source: 1809. Nelas
+  MUNICIPALITY_NELAS_1809 = 264;
+  // Source: 1810. Oliveira de Frades
+  MUNICIPALITY_OLIVEIRA_DE_FRADES_1810 = 265;
+  // Source: 1811. Penalva do Castelo
+  MUNICIPALITY_PENALVA_DO_CASTELO_1811 = 266;
+  // Source: 1812. Penedono
+  MUNICIPALITY_PENEDONO_1812 = 267;
+  // Source: 1813. Resende
+  MUNICIPALITY_RESENDE_1813 = 268;
+  // Source: 1814. Santa Comba Dão
+  MUNICIPALITY_SANTA_COMBA_DAO_1814 = 269;
+  // Source: 1815. São João da Pesqueira
+  MUNICIPALITY_SAO_JOAO_DA_PESQUEIRA_1815 = 270;
+  // Source: 1816. São Pedro do Sul
+  MUNICIPALITY_SAO_PEDRO_DO_SUL_1816 = 271;
+  // Source: 1817. Sátão
+  MUNICIPALITY_SATAO_1817 = 272;
+  // Source: 1818. Sernancelhe
+  MUNICIPALITY_SERNANCELHE_1818 = 273;
+  // Source: 1819. Tabuaço
+  MUNICIPALITY_TABUACO_1819 = 274;
+  // Source: 1820. Tarouca
+  MUNICIPALITY_TAROUCA_1820 = 275;
+  // Source: 1821. Tondela
+  MUNICIPALITY_TONDELA_1821 = 276;
+  // Source: 1822. Vila Nova de Paiva
+  MUNICIPALITY_VILA_NOVA_DE_PAIVA_1822 = 277;
+  // Source: 1823. Viseu
+  MUNICIPALITY_VISEU_1823 = 278;
+  // Source: 1824. Vouzela
+  MUNICIPALITY_VOUZELA_1824 = 279;
+  // Source: 3103. Funchal
+  MUNICIPALITY_FUNCHAL_3103 = 280;
+  // Source: 3201. Porto Santo
+  MUNICIPALITY_PORTO_SANTO_3201 = 281;
+  // Source: 4101. Vila do Porto
+  MUNICIPALITY_VILA_DO_PORTO_4101 = 282;
+  // Source: 4203. Ponta Delgada
+  MUNICIPALITY_PONTA_DELGADA_4203 = 283;
+  // Source: 4301. Angra do Heroísmo
+  MUNICIPALITY_ANGRA_DO_HEROISMO_4301 = 284;
+  // Source: 4401. Santa Cruz da Graciosa
+  MUNICIPALITY_SANTA_CRUZ_DA_GRACIOSA_4401 = 285;
+  // Source: 4502. Velas
+  MUNICIPALITY_VELAS_4502 = 286;
+  // Source: 4602. Madalena
+  MUNICIPALITY_MADALENA_4602 = 287;
+  // Source: 4701. Horta
+  MUNICIPALITY_HORTA_4701 = 288;
+  // Source: 4802. Santa Cruz das Flores
+  MUNICIPALITY_SANTA_CRUZ_DAS_FLORES_4802 = 289;
+  // Source: 4901. Vila do Corvo
+  MUNICIPALITY_VILA_DO_CORVO_4901 = 290;
+}

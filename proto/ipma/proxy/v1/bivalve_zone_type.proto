@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// https://api.ipma.pt/
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+enum BivalveZoneType {
+  BIVALVE_ZONE_TYPE_UNSPECIFIED = 0;
+  BIVALVE_ZONE_TYPE_OTHER = 1;
+  // Source: LITORAL. Exact source token.
+  BIVALVE_ZONE_TYPE_LITORAL = 2;
+  // Source: EST_LAG. Exact source token.
+  BIVALVE_ZONE_TYPE_EST_LAG = 3;
+}

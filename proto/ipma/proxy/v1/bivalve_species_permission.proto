@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/bivalve_harvest_permission_value.proto";
+import "ipma/proxy/v1/bivalve_sanitary_class_value.proto";
+import "ipma/proxy/v1/bivalve_species_value.proto";
+
+message BivalveSpeciesPermission {
+  BivalveSpeciesValue species = 1;
+  BivalveSanitaryClassValue sanitary_class = 2;
+  BivalveHarvestPermissionValue permission = 3;
+}

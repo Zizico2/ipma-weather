@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/distrits-islands.json
+// https://api.ipma.pt/open-data/sea-locations.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Includes weather and coastal locations; these are distinct source identities.
+// UV may contain additional IDs: preserve them with OTHER. Source 0 is unmapped,
+// represented by UNSPECIFIED with source_code=0, not a fabricated location.
+enum ForecastLocation {
+  FORECAST_LOCATION_UNSPECIFIED = 0;
+  FORECAST_LOCATION_OTHER = 1;
+  // Source: 1010500. Aveiro
+  FORECAST_LOCATION_AVEIRO_1010500 = 2;
+  // Source: 1020500. Beja
+  FORECAST_LOCATION_BEJA_1020500 = 3;
+  // Source: 1030300. Braga
+  FORECAST_LOCATION_BRAGA_1030300 = 4;
+  // Source: 1030800. Guimarães
+  FORECAST_LOCATION_GUIMARAES_1030800 = 5;
+  // Source: 1040200. Bragança
+  FORECAST_LOCATION_BRAGANCA_1040200 = 6;
+  // Source: 1050200. Castelo Branco
+  FORECAST_LOCATION_CASTELO_BRANCO_1050200 = 7;
+  // Source: 1060300. Coimbra
+  FORECAST_LOCATION_COIMBRA_1060300 = 8;
+  // Source: 1060526. Figueira da Foz, Costa
+  FORECAST_LOCATION_FIGUEIRA_DA_FOZ_COSTA_1060526 = 9;
+  // Source: 1070500. Évora
+  FORECAST_LOCATION_EVORA_1070500 = 10;
+  // Source: 1080500. Faro
+  FORECAST_LOCATION_FARO_1080500 = 11;
+  // Source: 1080526. Faro, costa
+  FORECAST_LOCATION_FARO_COSTA_1080526 = 12;
+  // Source: 1080800. Loulé
+  FORECAST_LOCATION_LOULE_1080800 = 13;
+  // Source: 1081100. Portimão
+  FORECAST_LOCATION_PORTIMAO_1081100 = 14;
+  // Source: 1081505. Sagres
+  FORECAST_LOCATION_SAGRES_1081505 = 15;
+  // Source: 1081526. Sagres, costa
+  FORECAST_LOCATION_SAGRES_COSTA_1081526 = 16;
+  // Source: 1090700. Guarda
+  FORECAST_LOCATION_GUARDA_1090700 = 17;
+  // Source: 1090821. Penhas Douradas
+  FORECAST_LOCATION_PENHAS_DOURADAS_1090821 = 18;
+  // Source: 1100900. Leiria
+  FORECAST_LOCATION_LEIRIA_1100900 = 19;
+  // Source: 1110600. Lisboa
+  FORECAST_LOCATION_LISBOA_1110600 = 20;
+  // Source: 1111026. Lisboa, costa
+  FORECAST_LOCATION_LISBOA_COSTA_1111026 = 21;
+  // Source: 1121400. Portalegre
+  FORECAST_LOCATION_PORTALEGRE_1121400 = 22;
+  // Source: 1130826. Porto, costa
+  FORECAST_LOCATION_PORTO_COSTA_1130826 = 23;
+  // Source: 1131200. Porto
+  FORECAST_LOCATION_PORTO_1131200 = 24;
+  // Source: 1141600. Santarém
+  FORECAST_LOCATION_SANTAREM_1141600 = 25;
+  // Source: 1151200. Setúbal
+  FORECAST_LOCATION_SETUBAL_1151200 = 26;
+  // Source: 1151300. Sines
+  FORECAST_LOCATION_SINES_1151300 = 27;
+  // Source: 1151326. Sines, costa
+  FORECAST_LOCATION_SINES_COSTA_1151326 = 28;
+  // Source: 1160900. Viana do Castelo
+  FORECAST_LOCATION_VIANA_DO_CASTELO_1160900 = 29;
+  // Source: 1160926. Viana do Castelo, costa
+  FORECAST_LOCATION_VIANA_DO_CASTELO_COSTA_1160926 = 30;
+  // Source: 1171400. Vila Real
+  FORECAST_LOCATION_VILA_REAL_1171400 = 31;
+  // Source: 1182300. Viseu
+  FORECAST_LOCATION_VISEU_1182300 = 32;
+  // Source: 2310300. Funchal
+  FORECAST_LOCATION_FUNCHAL_2310300 = 33;
+  // Source: 2310326. Funchal, costa
+  FORECAST_LOCATION_FUNCHAL_COSTA_2310326 = 34;
+  // Source: 2320100. Porto Santo
+  FORECAST_LOCATION_PORTO_SANTO_2320100 = 35;
+  // Source: 2320126. Porto Santo, costa
+  FORECAST_LOCATION_PORTO_SANTO_COSTA_2320126 = 36;
+  // Source: 3410100. Vila do Porto
+  FORECAST_LOCATION_VILA_DO_PORTO_3410100 = 37;
+  // Source: 3420226. Ponta Delgada, costa
+  FORECAST_LOCATION_PONTA_DELGADA_COSTA_3420226 = 38;
+  // Source: 3420300. Ponta Delgada
+  FORECAST_LOCATION_PONTA_DELGADA_3420300 = 39;
+  // Source: 3430100. Angra do Heroísmo
+  FORECAST_LOCATION_ANGRA_DO_HEROISMO_3430100 = 40;
+  // Source: 3440100. Santa Cruz da Graciosa
+  FORECAST_LOCATION_SANTA_CRUZ_DA_GRACIOSA_3440100 = 41;
+  // Source: 3450200. Velas
+  FORECAST_LOCATION_VELAS_3450200 = 42;
+  // Source: 3460200. Madalena
+  FORECAST_LOCATION_MADALENA_3460200 = 43;
+  // Source: 3470100. Horta
+  FORECAST_LOCATION_HORTA_3470100 = 44;
+  // Source: 3470126. Horta, costa
+  FORECAST_LOCATION_HORTA_COSTA_3470126 = 45;
+  // Source: 3480200. Santa Cruz das Flores
+  FORECAST_LOCATION_SANTA_CRUZ_DAS_FLORES_3480200 = 46;
+  // Source: 3480226. Santa Cruz das Flores, costa
+  FORECAST_LOCATION_SANTA_CRUZ_DAS_FLORES_COSTA_3480226 = 47;
+  // Source: 3490100. Vila do Corvo
+  FORECAST_LOCATION_VILA_DO_CORVO_3490100 = 48;
+}

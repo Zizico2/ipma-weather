@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/forecast/meteorology/uv/uv.json
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Code-based names intentionally make no claim about duration, timezone or day offset.
+enum UvPeriod {
+  UV_PERIOD_UNSPECIFIED = 0;
+  UV_PERIOD_OTHER = 1;
+  // Source: 0. Published API example; internal meaning not documented.
+  UV_PERIOD_CODE_0 = 2;
+  // Source: 10. Observed public UV feed; internal meaning not documented.
+  UV_PERIOD_CODE_10 = 3;
+}

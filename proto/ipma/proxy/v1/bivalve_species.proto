@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// https://api.ipma.pt/
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// The source includes other marine taxa as well as bivalves; spp. tokens stay distinct.
+enum BivalveSpecies {
+  BIVALVE_SPECIES_UNSPECIFIED = 0;
+  BIVALVE_SPECIES_OTHER = 1;
+  // Source: Arcopagia crassa. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_ARCOPAGIA_CRASSA = 2;
+  // Source: Bolinus brandaris. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_BOLINUS_BRANDARIS = 3;
+  // Source: Callista chione. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_CALLISTA_CHIONE = 4;
+  // Source: Cerastoderma edule. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_CERASTODERMA_EDULE = 5;
+  // Source: Chamelea gallina. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_CHAMELEA_GALLINA = 6;
+  // Source: Charonia rubicunda. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_CHARONIA_RUBICUNDA = 7;
+  // Source: Donax trunculus. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_DONAX_TRUNCULUS = 8;
+  // Source: Dosinia exoleta. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_DOSINIA_EXOLETA = 9;
+  // Source: Ensis spp.. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_ENSIS_SPP = 10;
+  // Source: Glycymeris glycymeris. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_GLYCYMERIS_GLYCYMERIS = 11;
+  // Source: Laevicardium crassum. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_LAEVICARDIUM_CRASSUM = 12;
+  // Source: Magallana angulata. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_MAGALLANA_ANGULATA = 13;
+  // Source: Magallana gigas. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_MAGALLANA_GIGAS = 14;
+  // Source: Murex trunculus. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_MUREX_TRUNCULUS = 15;
+  // Source: Mytilus spp.. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_MYTILUS_SPP = 16;
+  // Source: Ostrea edulis. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_OSTREA_EDULIS = 17;
+  // Source: Paracentrotus lividus. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_PARACENTROTUS_LIVIDUS = 18;
+  // Source: Patella spp.. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_PATELLA_SPP = 19;
+  // Source: Polititapes aureus. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_POLITITAPES_AUREUS = 20;
+  // Source: Ruditapes decussatus. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_RUDITAPES_DECUSSATUS = 21;
+  // Source: Ruditapes philippinarum. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_RUDITAPES_PHILIPPINARUM = 22;
+  // Source: Scrobicularia plana. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_SCROBICULARIA_PLANA = 23;
+  // Source: Solen marginatus. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_SOLEN_MARGINATUS = 24;
+  // Source: Spisula solida. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_SPISULA_SOLIDA = 25;
+  // Source: Venerupis corrugata. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_VENERUPIS_CORRUGATA = 26;
+  // Source: Venus casina. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_VENUS_CASINA = 27;
+  // Source: Venus verrucosa. Scientific name/taxon as published, not a taxonomic reinterpretation.
+  BIVALVE_SPECIES_VENUS_VERRUCOSA = 28;
+}

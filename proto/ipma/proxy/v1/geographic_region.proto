@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/ (idRegiao)
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+enum GeographicRegion {
+  GEOGRAPHIC_REGION_UNSPECIFIED = 0;
+  GEOGRAPHIC_REGION_OTHER = 1;
+  // Source: 1. Continente
+  GEOGRAPHIC_REGION_MAINLAND = 2;
+  // Source: 2. Arquipélago da Madeira
+  GEOGRAPHIC_REGION_MADEIRA = 3;
+  // Source: 3. Arquipélago dos Açores
+  GEOGRAPHIC_REGION_AZORES = 4;
+}

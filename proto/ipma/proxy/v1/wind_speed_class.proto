@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// IPMA daily wind-speed classes 1..4, distinct from a measured wind speed.
+enum WindSpeedClass {
+  WIND_SPEED_CLASS_UNSPECIFIED = 0;
+  WIND_SPEED_CLASS_WEAK = 1;
+  WIND_SPEED_CLASS_MODERATE = 2;
+  WIND_SPEED_CLASS_STRONG = 3;
+  WIND_SPEED_CLASS_VERY_STRONG = 4;
+  // A present upstream value outside the currently recognised vocabulary.
+  WIND_SPEED_CLASS_OTHER = 5;
+}

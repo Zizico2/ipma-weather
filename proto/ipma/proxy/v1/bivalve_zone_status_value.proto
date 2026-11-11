@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/bivalve_zone_status.proto";
+
+// Absent source values omit this message. OTHER retains its source identity.
+message BivalveZoneStatusValue {
+  BivalveZoneStatus value = 1;
+  // Exact original source representation, including unfamiliar values.
+  string source_value = 2;
+}

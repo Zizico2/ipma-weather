@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Recognising a token does not establish permission to harvest. Do not derive
+// harvest decisions from these values or expand undocumented NC/NA qualifiers.
+enum BivalveSanitaryClass {
+  BIVALVE_SANITARY_CLASS_UNSPECIFIED = 0;
+  BIVALVE_SANITARY_CLASS_OTHER = 1;
+  // Source: A. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_A = 2;
+  // Source: A*. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_A_STAR = 3;
+  // Source: B. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_B = 4;
+  // Source: B*. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_B_STAR = 5;
+  // Source: C. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_C = 6;
+  // Source: C*. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_C_STAR = 7;
+  // Source: NA. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_NA = 8;
+  // Source: NC. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_NC = 9;
+  // Source: Proibida. Exact source token; suffixes and exceptions are not collapsed.
+  BIVALVE_SANITARY_CLASS_PROIBIDA = 10;
+}

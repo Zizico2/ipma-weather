@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/district.proto";
+
+// Absent source values omit this message. OTHER retains its source identity.
+message DistrictValue {
+  District value = 1;
+  // Exact original source representation, including unfamiliar values.
+  uint32 source_code = 2;
+}

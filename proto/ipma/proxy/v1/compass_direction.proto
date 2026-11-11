@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Compass direction shared by wind and waves. NO_DIRECTION represents an
+// explicit station code 0; missing data is represented by absent DirectionValue.
+enum CompassDirection {
+  COMPASS_DIRECTION_UNSPECIFIED = 0;
+  COMPASS_DIRECTION_NO_DIRECTION = 1;
+  COMPASS_DIRECTION_NORTH = 2;
+  COMPASS_DIRECTION_NORTH_EAST = 3;
+  COMPASS_DIRECTION_EAST = 4;
+  COMPASS_DIRECTION_SOUTH_EAST = 5;
+  COMPASS_DIRECTION_SOUTH = 6;
+  COMPASS_DIRECTION_SOUTH_WEST = 7;
+  COMPASS_DIRECTION_WEST = 8;
+  COMPASS_DIRECTION_NORTH_WEST = 9;
+  // A present upstream value outside the currently recognised vocabulary.
+  COMPASS_DIRECTION_OTHER = 10;
+}

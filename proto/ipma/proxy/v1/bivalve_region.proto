@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// https://api.ipma.pt/
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+enum BivalveRegion {
+  BIVALVE_REGION_UNSPECIFIED = 0;
+  BIVALVE_REGION_OTHER = 1;
+  // Source: Alentejo. Exact source token.
+  BIVALVE_REGION_ALENTEJO = 2;
+  // Source: Algarve. Exact source token.
+  BIVALVE_REGION_ALGARVE = 3;
+  // Source: Centro. Exact source token.
+  BIVALVE_REGION_CENTRO = 4;
+  // Source: Lisboa e Vale do Tejo. Exact source token.
+  BIVALVE_REGION_LISBOA_E_VALE_DO_TEJO = 5;
+  // Source: Norte. Exact source token.
+  BIVALVE_REGION_NORTE = 6;
+}

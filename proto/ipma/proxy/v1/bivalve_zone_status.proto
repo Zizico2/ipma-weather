@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// https://api.ipma.pt/
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// CLOSED (documentation) and CLOSE (live data) remain distinct source cases.
+enum BivalveZoneStatus {
+  BIVALVE_ZONE_STATUS_UNSPECIFIED = 0;
+  BIVALVE_ZONE_STATUS_OTHER = 1;
+  // Source: OPEN. Exact source token.
+  BIVALVE_ZONE_STATUS_OPEN = 2;
+  // Source: PARTIAL_OPEN. Exact source token.
+  BIVALVE_ZONE_STATUS_PARTIAL_OPEN = 3;
+  // Source: CLOSED. Exact source token.
+  BIVALVE_ZONE_STATUS_CLOSED = 4;
+  // Source: CLOSE. Exact source token.
+  BIVALVE_ZONE_STATUS_CLOSE = 5;
+  // Source: NOINFO. Exact source token.
+  BIVALVE_ZONE_STATUS_NOINFO = 6;
+}

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// IPMA warning categories. The source Portuguese label is retained separately.
+enum WarningType {
+  WARNING_TYPE_UNSPECIFIED = 0;
+  WARNING_TYPE_THUNDERSTORMS = 1;
+  WARNING_TYPE_ROUGH_SEAS = 2;
+  WARNING_TYPE_PRECIPITATION = 3;
+  WARNING_TYPE_WIND = 4;
+  WARNING_TYPE_FOG = 5;
+  WARNING_TYPE_SNOW = 6;
+  WARNING_TYPE_COLD_WEATHER = 7;
+  WARNING_TYPE_HOT_WEATHER = 8;
+  // A present upstream value outside the currently recognised vocabulary.
+  WARNING_TYPE_OTHER = 9;
+}

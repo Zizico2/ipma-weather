@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// IPMA-specific weather catalogue. Enum numbers differ from source codes:
+// code 0 (no information) is meaningful, so known source codes 0..30 map to
+// enum values 1..31. Keep codes distinct even when translated captions match.
+enum WeatherType {
+  WEATHER_TYPE_UNSPECIFIED = 0;
+  // IPMA code 0.
+  WEATHER_TYPE_NO_INFORMATION = 1;
+  // IPMA code 1.
+  WEATHER_TYPE_CLEAR_SKY = 2;
+  // IPMA code 2.
+  WEATHER_TYPE_FEW_CLOUDS = 3;
+  // IPMA code 3.
+  WEATHER_TYPE_PARTLY_CLOUDY = 4;
+  // IPMA code 4.
+  WEATHER_TYPE_OVERCAST = 5;
+  // IPMA code 5.
+  WEATHER_TYPE_HIGH_CLOUDS = 6;
+  // IPMA code 6.
+  WEATHER_TYPE_SHOWERS_OR_RAIN = 7;
+  // IPMA code 7.
+  WEATHER_TYPE_LIGHT_SHOWERS_OR_RAIN = 8;
+  // IPMA code 8.
+  WEATHER_TYPE_HEAVY_SHOWERS_OR_RAIN = 9;
+  // IPMA code 9.
+  WEATHER_TYPE_RAIN_OR_SHOWERS = 10;
+  // IPMA code 10.
+  WEATHER_TYPE_LIGHT_RAIN_OR_DRIZZLE = 11;
+  // IPMA code 11.
+  WEATHER_TYPE_HEAVY_RAIN_OR_SHOWERS = 12;
+  // IPMA code 12.
+  WEATHER_TYPE_INTERMITTENT_RAIN = 13;
+  // IPMA code 13.
+  WEATHER_TYPE_INTERMITTENT_LIGHT_RAIN = 14;
+  // IPMA code 14.
+  WEATHER_TYPE_INTERMITTENT_HEAVY_RAIN = 15;
+  // IPMA code 15.
+  WEATHER_TYPE_DRIZZLE = 16;
+  // IPMA code 16.
+  WEATHER_TYPE_MIST = 17;
+  // IPMA code 17.
+  WEATHER_TYPE_FOG_OR_LOW_CLOUD = 18;
+  // IPMA code 18.
+  WEATHER_TYPE_SNOW = 19;
+  // IPMA code 19.
+  WEATHER_TYPE_THUNDERSTORMS = 20;
+  // IPMA code 20.
+  WEATHER_TYPE_SHOWERS_WITH_POSSIBLE_THUNDERSTORMS = 21;
+  // IPMA code 21.
+  WEATHER_TYPE_HAIL = 22;
+  // IPMA code 22.
+  WEATHER_TYPE_FROST = 23;
+  // IPMA code 23.
+  WEATHER_TYPE_RAIN_WITH_POSSIBLE_THUNDERSTORMS = 24;
+  // IPMA code 24.
+  WEATHER_TYPE_CONVECTIVE_CLOUDS = 25;
+  // IPMA code 25.
+  WEATHER_TYPE_CLOUDY_INTERVALS = 26;
+  // IPMA code 26.
+  WEATHER_TYPE_FOG = 27;
+  // IPMA code 27.
+  WEATHER_TYPE_CLOUDY = 28;
+  // IPMA code 28.
+  WEATHER_TYPE_SNOW_SHOWERS = 29;
+  // IPMA code 29.
+  WEATHER_TYPE_RAIN_AND_SNOW_CODE_29 = 30;
+  // IPMA code 30.
+  WEATHER_TYPE_RAIN_AND_SNOW_CODE_30 = 31;
+  // A present upstream value outside the currently recognised vocabulary.
+  WEATHER_TYPE_OTHER = 32;
+}

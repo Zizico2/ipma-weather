@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+// Only the source grouping is represented; absence from either list is not permission.
+enum BivalveHarvestPermission {
+  BIVALVE_HARVEST_PERMISSION_UNSPECIFIED = 0;
+  BIVALVE_HARVEST_PERMISSION_OTHER = 1;
+  // Source: open. Membership in the published open list.
+  BIVALVE_HARVEST_PERMISSION_OPEN = 2;
+  // Source: close. Membership in the published close list.
+  BIVALVE_HARVEST_PERMISSION_CLOSE = 3;
+}

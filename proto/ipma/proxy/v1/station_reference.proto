@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/station_value.proto";
+
+message StationReference {
+  StationValue station = 1;
+  // localEstacao when supplied by this dataset; not filled by another fetch.
+  optional string name = 2;
+}

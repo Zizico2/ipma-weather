@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/compass_direction.proto";
+
+// A direction with the exact source representation. Station codes 1 and 9 both
+// mean north; retaining the code avoids collapsing that source distinction.
+message DirectionValue {
+  CompassDirection value = 1;
+  oneof source {
+    string text = 2;
+    sint32 code = 3;
+  }
+}

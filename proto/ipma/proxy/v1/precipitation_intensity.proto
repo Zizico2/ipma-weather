@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// IPMA precipitation classes. Enum numbers differ from source codes: source 0
+// means no precipitation, while enum 0 is unspecified.
+enum PrecipitationIntensity {
+  PRECIPITATION_INTENSITY_UNSPECIFIED = 0;
+  PRECIPITATION_INTENSITY_NO_PRECIPITATION = 1;
+  PRECIPITATION_INTENSITY_WEAK = 2;
+  PRECIPITATION_INTENSITY_MODERATE = 3;
+  PRECIPITATION_INTENSITY_STRONG = 4;
+  // A present upstream value outside the currently recognised vocabulary.
+  PRECIPITATION_INTENSITY_OTHER = 5;
+}

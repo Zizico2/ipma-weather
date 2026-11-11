@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/warning_level.proto";
+
+// A categorical value paired with its original IPMA representation. Absent
+// measurements have no wrapper; OTHER retains a newly introduced source value.
+message WarningLevelValue {
+  WarningLevel value = 1;
+  // Original IPMA value, preserved even when value is OTHER.
+  string source_value = 2;
+}

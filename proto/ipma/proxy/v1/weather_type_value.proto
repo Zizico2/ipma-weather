@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/weather_type.proto";
+
+// A categorical value paired with its original IPMA representation. Absent
+// measurements have no wrapper; OTHER retains a newly introduced source value.
+message WeatherTypeValue {
+  WeatherType value = 1;
+  // Original IPMA value, preserved even when value is OTHER.
+  sint32 source_code = 2;
+}

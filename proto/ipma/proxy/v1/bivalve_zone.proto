@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+// Known IPMA vocabulary, reviewed from public API data on 2026-11-10.
+// Source: https://api.ipma.pt/open-data/observation/biology/bivalves/CI_SNMB.geojson
+// Enum numbers are stable API identifiers, not source codes. Never renumber or reuse.
+// OTHER means a present unrecognised source value; UNSPECIFIED means no value.
+enum BivalveZone {
+  BIVALVE_ZONE_UNSPECIFIED = 0;
+  BIVALVE_ZONE_OTHER = 1;
+  // Source: ELM. Estuário do Lima
+  BIVALVE_ZONE_ELM = 2;
+  // Source: EMN. Estuário do Mondego
+  BIVALVE_ZONE_EMN = 3;
+  // Source: EMR. Estuário do Rio Mira
+  BIVALVE_ZONE_EMR = 4;
+  // Source: ESD1. Estuário do Sado, Esteiro da Marateca
+  BIVALVE_ZONE_ESD1 = 5;
+  // Source: ESD2. Estuário do Sado, Canal de Alcácer
+  BIVALVE_ZONE_ESD2 = 6;
+  // Source: ETJ1. Estuário do Tejo, Jusante da Ponte Vasco da Gama
+  BIVALVE_ZONE_ETJ1 = 7;
+  // Source: ETJ2. Estuário do Tejo, Montante da Ponte Vasco da Gama
+  BIVALVE_ZONE_ETJ2 = 8;
+  // Source: FAR1. Ria Formosa, Faro, Cais Novo - Geada
+  BIVALVE_ZONE_FAR1 = 9;
+  // Source: FAR2. Ria Formosa, Faro, Regato de Azeites - Barrinha
+  BIVALVE_ZONE_FAR2 = 10;
+  // Source: FUZ. Ria Formosa, Fuzeta
+  BIVALVE_ZONE_FUZ = 11;
+  // Source: GUA. Rio Guadiana
+  BIVALVE_ZONE_GUA = 12;
+  // Source: L1. Litoral Viana
+  BIVALVE_ZONE_L1 = 13;
+  // Source: L2. Litoral Matosinhos
+  BIVALVE_ZONE_L2 = 14;
+  // Source: L3. Litoral Aveiro
+  BIVALVE_ZONE_L3 = 15;
+  // Source: L4. Litoral Figueira da Foz - Nazaré
+  BIVALVE_ZONE_L4 = 16;
+  // Source: L5a. Litoral Peniche - Cabo Raso
+  BIVALVE_ZONE_L5A = 17;
+  // Source: L5b. Litoral Cabo Raso - Lagoa de Albufeira
+  BIVALVE_ZONE_L5B = 18;
+  // Source: L6. Litoral Setúbal - Sines
+  BIVALVE_ZONE_L6 = 19;
+  // Source: L7a. Litoral Aljezur - S. Vicente
+  BIVALVE_ZONE_L7A = 20;
+  // Source: L7c1. Litoral São Vicente -Lagos
+  BIVALVE_ZONE_L7C1 = 21;
+  // Source: L7c2. Litoral Lagos -Albufeira
+  BIVALVE_ZONE_L7C2 = 22;
+  // Source: L8. Litoral Faro - Olhão
+  BIVALVE_ZONE_L8 = 23;
+  // Source: L9. Litoral Tavira – Vila Real Santo António
+  BIVALVE_ZONE_L9 = 24;
+  // Source: LAG. Ria de Alvor, Vale da Lama
+  BIVALVE_ZONE_LAG = 25;
+  // Source: LAL. Lagoa de Albufeira
+  BIVALVE_ZONE_LAL = 26;
+  // Source: LOB. Lagoa de Óbidos
+  BIVALVE_ZONE_LOB = 27;
+  // Source: OLH1. Ria Formosa, Olhão
+  BIVALVE_ZONE_OLH1 = 28;
+  // Source: OLH2. Ria Formosa, Olhão
+  BIVALVE_ZONE_OLH2 = 29;
+  // Source: OLH3. Ria Formosa, Olhão
+  BIVALVE_ZONE_OLH3 = 30;
+  // Source: OLH4. Ria Formosa, Olhão
+  BIVALVE_ZONE_OLH4 = 31;
+  // Source: OLH5. Ria Formosa, Olhão
+  BIVALVE_ZONE_OLH5 = 32;
+  // Source: POR2. Ria de Alvor, Povoação
+  BIVALVE_ZONE_POR2 = 33;
+  // Source: RIAV1. Ria de Aveiro, Triângulo das Correntes - Moacha
+  BIVALVE_ZONE_RIAV1 = 34;
+  // Source: RIAV2. Ria de Aveiro, Canal de Mira
+  BIVALVE_ZONE_RIAV2 = 35;
+  // Source: RIAV3. Ria de Aveiro, Canal Principal - Espinheiro
+  BIVALVE_ZONE_RIAV3 = 36;
+  // Source: RIAV4. Ria de Aveiro, Canal de Ílhavo
+  BIVALVE_ZONE_RIAV4 = 37;
+  // Source: TAV. Ria Formosa, Tavira
+  BIVALVE_ZONE_TAV = 38;
+}

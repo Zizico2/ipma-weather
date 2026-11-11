@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package ipma.proxy.v1;
+
+import "ipma/proxy/v1/uv_period.proto";
+
+// Absent source values omit this message. OTHER retains its source identity.
+message UvPeriodValue {
+  UvPeriod value = 1;
+  // Exact original source representation, including unfamiliar values.
+  sint32 source_code = 2;
+  // Original intervaloHora, including empty text; do not infer it from the code.
+  string peak_hour_interval = 3;
+}

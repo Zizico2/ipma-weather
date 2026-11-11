@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { WeatherData } from '../../../components/weather-data';
+import { CityForecast } from '../../../components/weather-data';
 import { WeatherLoading } from '../../../components/weather-shell';
 import { parseLocationId } from '../../../lib/weather';
 
@@ -11,7 +11,7 @@ async function CityWeather({
 }) {
   const id = parseLocationId((await params).locationId);
   if (id === null) notFound();
-  return <WeatherData locationId={id} />;
+  return <CityForecast locationId={id} />;
 }
 
 export default function Page({

@@ -2,7 +2,19 @@ import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { createWeatherDb, forecastQuery } from '../lib/collections';
 import { getForecast, getLocations } from '../server/weather';
+import { RememberLocation } from './remember-location';
 import { WeatherClient } from './weather-client';
+
+export async function CityForecast({ locationId }: { locationId: number }) {
+  const locations = await getLocations();
+  if (!locations.some((location) => location.id === locationId)) notFound();
+  return (
+    <>
+      <RememberLocation locationId={locationId} />
+      <WeatherData locationId={locationId} />
+    </>
+  );
+}
 
 export async function WeatherData({ locationId }: { locationId: number }) {
   'use cache';

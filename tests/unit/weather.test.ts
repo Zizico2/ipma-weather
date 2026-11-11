@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   conditionKind,
   dayLabel,
+  LATEST_LOCATION_COOKIE,
+  LATEST_LOCATION_MAX_AGE_SECONDS,
+  latestLocationCookie,
+  latestLocationId,
   parseLocationId,
   temperature,
 } from '../../src/lib/weather';
@@ -25,6 +29,19 @@ describe('weather presentation', () => {
   );
   it('accepts supported ID syntax', () =>
     expect(parseLocationId('1110600')).toBe(1110600));
+  it('defaults a missing or invalid latest city to Lisbon', () => {
+    expect(latestLocationId(undefined)).toBe(1110600);
+    expect(latestLocationId('')).toBe(1110600);
+    expect(latestLocationId('1131200')).toBe(1131200);
+    expect(latestLocationId('nope')).toBe(1110600);
+    expect(latestLocationId('4294967296')).toBe(1110600);
+  });
+  it('writes a host cookie the next /weather request can read', () => {
+    expect(latestLocationCookie(1131200)).toBe(
+      `${LATEST_LOCATION_COOKIE}=1131200; Path=/; Max-Age=${LATEST_LOCATION_MAX_AGE_SECONDS}; SameSite=Lax`,
+    );
+    expect(latestLocationCookie(1110600, true)).toContain('; Secure');
+  });
   it('uses the source weather codes and preserves unknowns', () => {
     expect(conditionKind(9)).toBe('rain');
     expect(conditionKind(18)).toBe('snow');

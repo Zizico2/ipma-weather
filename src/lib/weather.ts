@@ -23,10 +23,26 @@ export type Forecast = {
 
 export const DEFAULT_LOCATION_ID = 1110600;
 
+/** Last city the visitor opened. Read on `/weather` before choosing a redirect. */
+export const LATEST_LOCATION_COOKIE = 'latest-location';
+
+/** Chrome drops cookies whose Max-Age is longer than 400 days. */
+export const LATEST_LOCATION_MAX_AGE_SECONDS = 60 * 60 * 24 * 400;
+
 export function parseLocationId(value: string): number | null {
   if (!/^[1-9]\d{0,9}$/.test(value)) return null;
   const id = Number(value);
   return id <= 4_294_967_295 ? id : null;
+}
+
+export function latestLocationId(value: string | undefined): number {
+  if (!value) return DEFAULT_LOCATION_ID;
+  return parseLocationId(value) ?? DEFAULT_LOCATION_ID;
+}
+
+export function latestLocationCookie(id: number, secure = false): string {
+  const secureAttribute = secure ? '; Secure' : '';
+  return `${LATEST_LOCATION_COOKIE}=${id}; Path=/; Max-Age=${LATEST_LOCATION_MAX_AGE_SECONDS}; SameSite=Lax${secureAttribute}`;
 }
 
 export function temperature(

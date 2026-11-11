@@ -1,5 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { locationSearch } from './location-picker';
+
+async function latestCity(page: Page) {
+  return (await page.context().cookies()).find(
+    (cookie) => cookie.name === 'latest-location',
+  )?.value;
+}
 
 test('RSC includes populated weather in the streamed server HTML', async ({
   browser,
@@ -79,6 +85,72 @@ test('renders missing measurements and an empty published forecast honestly', as
   await expect(
     page.getByRole('heading', { name: 'No forecast published yet.' }),
   ).toBeVisible();
+});
+
+test('opens the latest city from /weather, otherwise Lisbon', async ({
+  page,
+  request,
+}) => {
+  const anonymous = await request.get('/weather', { maxRedirects: 0 });
+  expect(anonymous.status()).toBe(307);
+  expect(anonymous.headers().location).toMatch(/\/weather\/1110600$/);
+  expect(anonymous.headers()['cache-control']).toContain('no-store');
+
+  const remembered = await request.get('/weather', {
+    maxRedirects: 0,
+    headers: { cookie: 'latest-location=1131200' },
+  });
+  expect(remembered.status()).toBe(307);
+  expect(remembered.headers().location).toMatch(/\/weather\/1131200$/);
+
+  const invalid = await request.get('/weather', {
+    maxRedirects: 0,
+    headers: { cookie: 'latest-location=nope' },
+  });
+  expect(invalid.headers().location).toMatch(/\/weather\/1110600$/);
+
+  await page.goto('/weather');
+  await expect(page).toHaveURL(/\/weather\/1110600$/);
+  await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
+  await expect.poll(() => latestCity(page)).toBe('1110600');
+
+  await (await locationSearch(page)).fill('porto');
+  await page.getByRole('link', { name: 'Porto', exact: true }).click();
+  await expect(page).toHaveURL('/weather/1131200');
+  await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
+  await expect.poll(() => latestCity(page)).toBe('1131200');
+
+  const search = await locationSearch(page);
+  await search.fill('faro');
+  const faro = page.getByRole('link', { name: 'Faro', exact: true });
+  await expect(faro).toBeVisible();
+  await faro.hover();
+  await page.waitForLoadState('networkidle');
+  expect(await latestCity(page)).toBe('1131200');
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
+  await expect.poll(() => latestCity(page)).toBe('1131200');
+
+  await page.goto('/weather');
+  await expect(page).toHaveURL(/\/weather\/1131200$/);
+  await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
+});
+
+test('redirects /weather without JavaScript', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  await context.addCookies([
+    {
+      name: 'latest-location',
+      value: '1080500',
+      url: baseURL,
+    },
+  ]);
+  const page = await context.newPage();
+  await page.goto('/weather');
+  await expect(page).toHaveURL(/\/weather\/1080500$/);
+  await expect(page.locator('h1').filter({ hasText: 'Faro' })).toBeAttached();
+  await context.close();
 });
 
 test('handles backend failure and unknown locations', async ({

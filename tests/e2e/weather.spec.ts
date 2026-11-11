@@ -163,6 +163,7 @@ test('redirects /weather without JavaScript', async ({ browser, baseURL }) => {
 test('handles backend failure and unknown locations', async ({
   page,
   request,
+  baseURL,
 }) => {
   await page.goto('/weather/1030300');
   await expect(
@@ -172,10 +173,24 @@ test('handles backend failure and unknown locations', async ({
   expect((await request.get('/api/forecasts/not-a-number')).status()).toBe(400);
   expect((await request.get('/api/forecasts/123')).status()).toBe(404);
   await page.goto('/weather/123');
+  const back = page.getByRole('link', { name: 'Back to your forecast →' });
   await expect(
     page.getByRole('heading', { name: 'That place isn’t in our forecast.' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('link', { name: 'Back to Lisbon →' }),
-  ).toHaveAttribute('href', '/weather/1110600');
+  await expect(back).toHaveAttribute('href', '/');
+  await back.click();
+  await expect(page).toHaveURL(/\/weather\/1110600$/);
+  await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
+
+  await page.context().addCookies([
+    {
+      name: 'latest-location',
+      value: '1131200',
+      url: baseURL,
+    },
+  ]);
+  await page.goto('/weather/123');
+  await page.getByRole('link', { name: 'Back to your forecast →' }).click();
+  await expect(page).toHaveURL(/\/weather\/1131200$/);
+  await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
 });

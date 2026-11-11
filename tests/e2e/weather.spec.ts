@@ -122,10 +122,7 @@ test('opens the latest city from / and /weather, otherwise Lisbon', async ({
   await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
   await expect.poll(() => latestCity(page)).toBe('1131200');
 
-  await page
-    .getByRole('banner')
-    .getByRole('link', { name: 'tempo.' })
-    .click();
+  await page.getByRole('banner').getByRole('link', { name: 'tempo.' }).click();
   await expect(page).toHaveURL(/\/weather\/1131200$/);
   await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
 

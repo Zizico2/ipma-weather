@@ -15,11 +15,7 @@ import { MapPin } from 'lucide-react';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ComponentProps, Suspense, useState } from 'react';
-import {
-  DEFAULT_LOCATION_ID,
-  parseLocationId,
-  type WeatherLocation,
-} from '../lib/weather';
+import { parseLocationId, type WeatherLocation } from '../lib/weather';
 
 export function LocationSidebar({
   locations,
@@ -90,10 +86,7 @@ function SelectedLocationLinks({
   locations: WeatherLocation[];
 }) {
   const pathname = usePathname();
-  const selectedId =
-    pathname === '/'
-      ? DEFAULT_LOCATION_ID
-      : parseLocationId(pathname.split('/')[2] ?? '');
+  const selectedId = parseLocationId(pathname.split('/')[2] ?? '');
   return <LocationLinks locations={locations} selectedId={selectedId} />;
 }
 

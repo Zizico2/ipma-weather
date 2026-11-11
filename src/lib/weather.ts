@@ -23,7 +23,7 @@ export type Forecast = {
 
 export const DEFAULT_LOCATION_ID = 1110600;
 
-/** Last city the visitor opened. Read on `/weather` before choosing a redirect. */
+/** Last city the visitor opened. `/` and `/weather` redirect here, or to Lisbon. */
 export const LATEST_LOCATION_COOKIE = 'latest-location';
 
 /** Chrome drops cookies whose Max-Age is longer than 400 days. */

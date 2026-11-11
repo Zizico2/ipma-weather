@@ -87,27 +87,29 @@ test('renders missing measurements and an empty published forecast honestly', as
   ).toBeVisible();
 });
 
-test('opens the latest city from /weather, otherwise Lisbon', async ({
+test('opens the latest city from / and /weather, otherwise Lisbon', async ({
   page,
   request,
 }) => {
-  const anonymous = await request.get('/weather', { maxRedirects: 0 });
-  expect(anonymous.status()).toBe(307);
-  expect(anonymous.headers().location).toMatch(/\/weather\/1110600$/);
-  expect(anonymous.headers()['cache-control']).toContain('no-store');
+  for (const path of ['/', '/weather']) {
+    const anonymous = await request.get(path, { maxRedirects: 0 });
+    expect(anonymous.status()).toBe(307);
+    expect(anonymous.headers().location).toMatch(/\/weather\/1110600$/);
+    expect(anonymous.headers()['cache-control']).toContain('no-store');
 
-  const remembered = await request.get('/weather', {
-    maxRedirects: 0,
-    headers: { cookie: 'latest-location=1131200' },
-  });
-  expect(remembered.status()).toBe(307);
-  expect(remembered.headers().location).toMatch(/\/weather\/1131200$/);
+    const remembered = await request.get(path, {
+      maxRedirects: 0,
+      headers: { cookie: 'latest-location=1131200' },
+    });
+    expect(remembered.status()).toBe(307);
+    expect(remembered.headers().location).toMatch(/\/weather\/1131200$/);
 
-  const invalid = await request.get('/weather', {
-    maxRedirects: 0,
-    headers: { cookie: 'latest-location=nope' },
-  });
-  expect(invalid.headers().location).toMatch(/\/weather\/1110600$/);
+    const invalid = await request.get(path, {
+      maxRedirects: 0,
+      headers: { cookie: 'latest-location=nope' },
+    });
+    expect(invalid.headers().location).toMatch(/\/weather\/1110600$/);
+  }
 
   await page.goto('/weather');
   await expect(page).toHaveURL(/\/weather\/1110600$/);
@@ -120,6 +122,13 @@ test('opens the latest city from /weather, otherwise Lisbon', async ({
   await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
   await expect.poll(() => latestCity(page)).toBe('1131200');
 
+  await page
+    .getByRole('banner')
+    .getByRole('link', { name: 'tempo.' })
+    .click();
+  await expect(page).toHaveURL(/\/weather\/1131200$/);
+  await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
+
   const search = await locationSearch(page);
   await search.fill('faro');
   const faro = page.getByRole('link', { name: 'Faro', exact: true });
@@ -129,7 +138,8 @@ test('opens the latest city from /weather, otherwise Lisbon', async ({
   expect(await latestCity(page)).toBe('1131200');
 
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
+  await expect(page).toHaveURL(/\/weather\/1131200$/);
+  await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
   await expect.poll(() => latestCity(page)).toBe('1131200');
 
   await page.goto('/weather');
@@ -168,4 +178,7 @@ test('handles backend failure and unknown locations', async ({
   await expect(
     page.getByRole('heading', { name: 'That place isn’t in our forecast.' }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Back to Lisbon →' }),
+  ).toHaveAttribute('href', '/weather/1110600');
 });

@@ -25,6 +25,8 @@ export function WeatherShell({
           label="Tempo"
           heading={
             <TopNavHeading
+              // `/` is a redirect, so this stays a plain link the browser can follow.
+              as="a"
               heading="tempo."
               headingHref="/"
               logo={<TempoBrandIcon />}

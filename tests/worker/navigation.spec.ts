@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { locationSearch } from '../e2e/location-picker';
 
 for (const intent of ['hover', 'focus'] as const) {
   test(`Worker completes new city visits after ${intent}`, async ({ page }) => {
@@ -12,9 +13,7 @@ for (const intent of ['hover', 'focus'] as const) {
       'Bragança',
       'Castelo Branco',
     ]) {
-      const search = page.getByRole('searchbox', {
-        name: 'Search locations',
-      });
+      const search = await locationSearch(page);
       await search.fill(city);
       const link = page.getByRole('link', { name: city, exact: true });
       if (intent === 'hover') await link.hover();
@@ -90,6 +89,7 @@ test('Worker resumes the forecast and reuses visited cities without the network'
   await page.clock.install();
   await page.goto('/weather/1010500');
   await expect(page.getByRole('heading', { name: 'Aveiro,' })).toBeVisible();
+  await locationSearch(page);
   await page.getByRole('link', { name: 'Beja', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Beja,' })).toBeVisible();
   await page.waitForLoadState('networkidle');
@@ -99,9 +99,11 @@ test('Worker resumes the forecast and reuses visited cities without the network'
   // unreachable. This catches bugs hidden by fast responses from next start.
   await page.route('**/weather/**', (route) => route.abort());
   await page.route('**/api/**', (route) => route.abort());
+  await locationSearch(page);
   await page.getByRole('link', { name: 'Aveiro', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Aveiro,' })).toBeVisible();
   await expect(page.getByText('Loading the forecast from IPMA…')).toBeHidden();
+  await locationSearch(page);
   await page.getByRole('link', { name: 'Beja', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Beja,' })).toBeVisible();
   expect(errors).toEqual([]);

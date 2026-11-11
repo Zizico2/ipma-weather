@@ -124,6 +124,30 @@ Buf invokes the pinned local Protobuf-ES generator. Update the schema snapshot
 and its provenance together when adopting a newer backend contract. Generated
 types use `.ts` import extensions, enabled in `tsconfig.json`.
 
+## UI and theme
+
+Build with [Astryx components](https://astryx.atmeta.com/components) and its
+[documentation](https://astryx.atmeta.com/docs/). The app shell and mobile
+navigation use AppShell, TopNav, and SideNav. Layout, Stack, Grid, and Section
+own composition; forecast days use RadioList inside Carousel. Typography,
+metadata, loading, errors, and empty states also use Astryx.
+
+Tempo's editable theme is `src/themes/tempo/tempoTheme.ts`. It extends Neutral
+with warm paper surfaces, sage accents, typography, and forecast card variants.
+Use component `xstyle` props for local artwork and styling. Change shared styles
+in the theme, then regenerate and commit its production CSS/JS/types:
+
+```sh
+bun run theme:build
+bun run theme:check
+bun run astryx:doctor
+```
+
+The app imports the built theme so SSR includes its styles on the first paint.
+Generated outputs live in `src/themes/tempo/generated/`; edit the source rather
+than those files. Look up the installed API with `bun run astryx component
+<Name>` and `bun run astryx docs author-a-theme`.
+
 ## Verify
 
 ```sh

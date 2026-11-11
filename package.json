@@ -22,6 +22,9 @@
     "test:e2e:worker": "bun run build:cf && playwright test --config playwright.worker.config.ts",
     "proto:generate": "bun scripts/generate-proto.ts",
     "check:client": "bun scripts/check-client-bundle.ts",
+    "theme:build": "bun run astryx theme build src/themes/tempo/tempoTheme.ts --out src/themes/tempo/generated/tempo.css",
+    "theme:check": "bun run theme:build --check",
+    "astryx:doctor": "bun run astryx doctor --built .",
     "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs"
   },
   "dependencies": {
@@ -64,6 +67,7 @@
     "wrangler": "4.160.0"
   },
   "patchedDependencies": {
-    "@opennextjs/cloudflare@1.20.16": "patches/@opennextjs%2Fcloudflare@1.20.16.patch"
+    "@opennextjs/cloudflare@1.20.16": "patches/@opennextjs%2Fcloudflare@1.20.16.patch",
+    "@astryxdesign/cli@0.7.13": "patches/@astryxdesign%2Fcli@0.7.13.patch"
   }
 }

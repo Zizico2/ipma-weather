@@ -34,3 +34,27 @@ when upgrading to an adapter release containing both fixes, and run
 `bun run test:e2e:worker` against the replacement. The regression suite
 checks completed forecast payloads as well as browser navigation: an HTTP 200
 and a closed stream alone do not prove a prefetch is usable.
+
+## Astryx doctor source scanning
+
+`@astryxdesign/cli@0.7.13` is patched locally to distinguish application source
+from Next.js test builds (`.next-*`) and Cloudflare output (`.open-next` and
+`.wrangler`). The original source walker parsed about 200 MB of emitted JS in
+this checkout and exceeded Node's default 4 GB heap before returning a report.
+Coverage and browser-test reports are also excluded from source inspection.
+
+The `--built` walker still reads those outputs to detect Astryx styles, but
+marks them as generated so they are never parsed as application source. An
+explicit build subdirectory (such as `.next/static`) keeps that classification.
+No heap increase, deleted cache, or skipped doctor check is needed.
+
+Run `bun run astryx:doctor` to check source and output together, or
+`bun run astryx doctor --built .next` to check the production output alone.
+The remaining source warnings for Next's required global CSS import and
+StyleX declarations using theme tokens are intentional; component customization
+with StyleX is authorized by this project's UI instructions.
+
+`tests/unit/astryx-doctor.test.ts` covers both walkers and explicit build paths.
+The patch is applied by `bun install --frozen-lockfile`. Remove it when the
+upstream CLI excludes these outputs, and run the regression tests before
+upgrading. The CLI and Core versions must remain aligned.

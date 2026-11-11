@@ -1,3 +1,7 @@
+'use client';
+
+import { Icon } from '@astryxdesign/core/Icon';
+import * as stylex from '@stylexjs/stylex';
 import {
   CircleHelp,
   CloudFog,
@@ -11,10 +15,10 @@ import { conditionKind } from '../lib/weather';
 
 export function WeatherIcon({
   code,
-  size = 32,
+  size = 'forecast',
 }: {
   code: number | null;
-  size?: number;
+  size?: 'forecast' | 'hero';
 }) {
   const icons = {
     sun: Sun,
@@ -25,6 +29,24 @@ export function WeatherIcon({
     fog: CloudFog,
     unknown: CircleHelp,
   };
-  const Icon = icons[conditionKind(code)];
-  return <Icon size={size} strokeWidth={1.5} aria-hidden="true" />;
+  return (
+    <Icon
+      icon={icons[conditionKind(code)]}
+      size="lg"
+      strokeWidth={1.5}
+      xstyle={styles[size]}
+    />
+  );
 }
+
+// Artwork uses theme-owned dimensions while ordinary UI icons use Icon's sizes.
+const styles = stylex.create({
+  forecast: {
+    width: 'var(--tempo-weather-icon-forecast)',
+    height: 'var(--tempo-weather-icon-forecast)',
+  },
+  hero: {
+    width: 'var(--tempo-weather-icon-hero)',
+    height: 'var(--tempo-weather-icon-hero)',
+  },
+});

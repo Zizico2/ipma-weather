@@ -1,46 +1,5 @@
 @import "@astryxdesign/core/reset.css";
 @import "@astryxdesign/core/astryx.css";
-@import "@astryxdesign/theme-neutral/theme.css";
+@import "../themes/tempo/generated/tempo.css";
 
 @stylex;
-
-html {
-  background: #f5f5f0;
-  color: #192e32;
-}
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-* {
-  box-sizing: border-box;
-}
-button,
-input {
-  font: inherit;
-}
-button,
-a,
-input {
-  -webkit-tap-highlight-color: transparent;
-}
-a {
-  color: inherit;
-}
-::selection {
-  background: #d9f2a5;
-  color: #192e32;
-}
-:focus-visible {
-  outline: 3px solid #467c6a;
-  outline-offset: 5px;
-}
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-}

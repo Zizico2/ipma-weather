@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light" data-astryx-theme="tempo">
       <body>
         <Providers>
           <WeatherShell sidebar={<LocationSidebarData />}>

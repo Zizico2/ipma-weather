@@ -1,6 +1,25 @@
 'use client';
 
+import { Banner } from '@astryxdesign/core/Banner';
 import { Button } from '@astryxdesign/core/Button';
+import { Card } from '@astryxdesign/core/Card';
+import { Carousel } from '@astryxdesign/core/Carousel';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { Grid } from '@astryxdesign/core/Grid';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Icon } from '@astryxdesign/core/Icon';
+import {
+  MetadataList,
+  MetadataListItem,
+} from '@astryxdesign/core/MetadataList';
+import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
+import { Section } from '@astryxdesign/core/Section';
+import {
+  SegmentedControl,
+  SegmentedControlItem,
+} from '@astryxdesign/core/SegmentedControl';
+import { Stack, StackItem } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
 import type { DehydratedDbState } from '@tanstack/db';
 import {
@@ -11,6 +30,7 @@ import {
 import {
   ArrowDown,
   ArrowUp,
+  CloudSun,
   Droplets,
   MapPin,
   RefreshCw,
@@ -65,188 +85,246 @@ function WeatherDashboard({ location }: { location: WeatherLocation }) {
   }
 
   return (
-    <section {...stylex.props(styles.content)} aria-label="Weather forecast">
-      <div {...stylex.props(styles.titleRow)}>
-        <div>
-          <p {...stylex.props(styles.eyebrow)}>YOUR DAILY OUTLOOK</p>
-          <h1 {...stylex.props(styles.title)}>
-            {location?.name ?? 'Portugal'}
-            <span {...stylex.props(styles.comma)}>,</span>
-          </h1>
-          <p {...stylex.props(styles.subtitle)}>
+    <Stack as="section" gap={6} aria-label="Weather forecast">
+      <Stack
+        direction="horizontal"
+        justify="between"
+        align="center"
+        gap={4}
+        wrap="wrap"
+      >
+        <Stack gap={2}>
+          <Text type="label" color="secondary">
+            Your daily outlook
+          </Text>
+          <Heading level={1} type="display-2">
+            {location.name},
+          </Heading>
+          <Text color="secondary">
             A good day starts with a little outlook.
-          </p>
-        </div>
-        <fieldset {...stylex.props(styles.units)} aria-label="Temperature unit">
-          {(['C', 'F'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setUnit(value)}
-              aria-pressed={unit === value}
-              {...stylex.props(
-                styles.unit,
-                unit === value && styles.unitActive,
-              )}
-            >
-              °{value}
-            </button>
-          ))}
-        </fieldset>
-      </div>
+          </Text>
+        </Stack>
+        <SegmentedControl
+          label="Temperature unit"
+          value={unit}
+          onChange={(value) => {
+            if (value === 'C' || value === 'F') setUnit(value);
+          }}
+          isDisabled={!hydrated}
+        >
+          <SegmentedControlItem value="C" label="°C" />
+          <SegmentedControlItem value="F" label="°F" />
+        </SegmentedControl>
+      </Stack>
 
       {!selected ? (
-        <div {...stylex.props(styles.empty)} role="status">
-          <h2>No forecast published yet.</h2>
-          <p>Try another location or check back soon.</p>
-          <Button
-            label="Check again"
-            onClick={() => void refresh()}
-            isLoading={refreshing}
-            isDisabled={!hydrated}
-          />
-        </div>
-      ) : (
-        <>
-          <div {...stylex.props(styles.hero)}>
-            <div {...stylex.props(styles.heroCopy)}>
-              <p {...stylex.props(styles.heroLabel)}>
-                {dayLabel(selected.date, 'long')}{' '}
-                <span {...stylex.props(styles.heroPill)}>DAILY FORECAST</span>
-              </p>
-              <div {...stylex.props(styles.heroTemp)}>
-                {temperature(selected.maximum, unit)}
-                <span {...stylex.props(styles.heroUnit)}>{unit}</span>
-              </div>
-              <p {...stylex.props(styles.condition)}>{selected.condition}</p>
-              <div {...stylex.props(styles.highLow)}>
-                <span {...stylex.props(styles.highLowItem)}>
-                  <ArrowUp size={14} aria-hidden="true" />{' '}
-                  {temperature(selected.maximum, unit)} high
-                </span>
-                <span {...stylex.props(styles.highLowItem)}>
-                  <ArrowDown size={14} aria-hidden="true" />{' '}
-                  {temperature(selected.minimum, unit)} low
-                </span>
-              </div>
-            </div>
-            <div {...stylex.props(styles.sky)} aria-hidden="true">
-              <div {...stylex.props(styles.orbit)} />
-              <div {...stylex.props(styles.orbitSmall)} />
-              <div {...stylex.props(styles.sun)} />
-              <div {...stylex.props(styles.heroIcon)}>
-                <WeatherIcon code={selected.weatherCode} size={90} />
-              </div>
-              <span {...stylex.props(styles.skyCaption)}>
-                A WINDOW TO THE WEATHER
-              </span>
-            </div>
-          </div>
-
-          <div {...stylex.props(styles.sectionHeading)}>
-            <h2 {...stylex.props(styles.sectionTitle)}>The days ahead</h2>
-            <span {...stylex.props(styles.muted)}>
-              {forecasts.length}-day forecast
-            </span>
-          </div>
-          <div {...stylex.props(styles.forecastGrid)}>
-            {forecasts.map((day) => (
-              <button
-                type="button"
-                key={day.id}
-                aria-pressed={day.id === selected.id}
-                onClick={() => setDate(day.date)}
-                aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
-                {...stylex.props(
-                  styles.day,
-                  day.id === selected.id && styles.dayActive,
-                )}
-              >
-                <span {...stylex.props(styles.dayName)}>
-                  {dayLabel(day.date).split(' ')[0]}
-                </span>
-                <span {...stylex.props(styles.dayDate)}>
-                  {dayLabel(day.date).split(' ').slice(1).join(' ')}
-                </span>
-                <div {...stylex.props(styles.dayIcon)}>
-                  <WeatherIcon code={day.weatherCode} />
-                </div>
-                <span {...stylex.props(styles.dayTemps)}>
-                  {temperature(day.maximum, unit)}{' '}
-                  <span {...stylex.props(styles.lowTemp)}>
-                    {temperature(day.minimum, unit)}
-                  </span>
-                </span>
-                <span {...stylex.props(styles.rain)}>
-                  <Droplets size={12} aria-hidden="true" />
-                  {day.rain === null ? '—' : `${Math.round(day.rain)}%`}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div {...stylex.props(styles.details)}>
-            <div {...stylex.props(styles.detail)}>
-              <Droplets size={21} strokeWidth={1.5} aria-hidden="true" />
-              <div>
-                <p {...stylex.props(styles.detailLabel)}>CHANCE OF RAIN</p>
-                <p {...stylex.props(styles.detailValue)}>
-                  {selected.rain === null
-                    ? 'Unavailable'
-                    : `${Math.round(selected.rain)}%`}
-                </p>
-              </div>
-            </div>
-            <div {...stylex.props(styles.detail)}>
-              <Wind size={22} strokeWidth={1.5} aria-hidden="true" />
-              <div>
-                <p {...stylex.props(styles.detailLabel)}>PREVAILING WIND</p>
-                <p {...stylex.props(styles.detailValue)}>
-                  {selected.windDirection || 'Unavailable'}
-                </p>
-              </div>
-            </div>
-            <div {...stylex.props(styles.detail)}>
-              <MapPin size={21} strokeWidth={1.5} aria-hidden="true" />
-              <div>
-                <p {...stylex.props(styles.detailLabel)}>COORDINATES</p>
-                <p {...stylex.props(styles.coordinate)}>
-                  {location?.latitude != null && location.longitude != null
-                    ? `${Math.abs(location.latitude).toFixed(2)}° ${location.latitude < 0 ? 'S' : 'N'} / ${Math.abs(location.longitude).toFixed(2)}° ${location.longitude < 0 ? 'W' : 'E'}`
-                    : 'Unavailable'}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div {...stylex.props(styles.freshness)}>
-            <p {...stylex.props(styles.freshnessText)}>
-              Daily highs & lows, in °{unit}.{' '}
-              {selected.updatedAt
-                ? `Source updated ${formatTime(selected.updatedAt)}.`
-                : 'Source update time unavailable.'}
-              <br />
-              {selected.fetchedAt
-                ? `Retrieved ${formatTime(selected.fetchedAt)}. `
-                : ''}
-              Shared forecast cache · 5-minute revalidation.
-            </p>
+        <EmptyState
+          title="No forecast published yet."
+          description="Try another location or check back soon."
+          icon={<Icon icon={CloudSun} size="lg" />}
+          actions={
             <Button
-              label="Refresh"
-              variant="ghost"
-              size="sm"
-              icon={<RefreshCw size={14} aria-hidden="true" />}
+              label="Check again"
               onClick={() => void refresh()}
               isLoading={refreshing}
               isDisabled={!hydrated}
             />
-          </div>
-          <p {...stylex.props(styles.attribution)}>{selected.attribution}</p>
+          }
+        />
+      ) : (
+        <>
+          <Card variant="weather" padding={6} xstyle={styles.hero}>
+            <Grid columns={{ minWidth: 240, max: 2 }} gap={6} align="center">
+              <Stack gap={4}>
+                <Stack
+                  direction="horizontal"
+                  align="center"
+                  gap={3}
+                  wrap="wrap"
+                >
+                  <Text type="label">{dayLabel(selected.date, 'long')}</Text>
+                  <Text type="supporting" color="secondary">
+                    Daily forecast
+                  </Text>
+                </Stack>
+                <Text type="display-1" hasTabularNumbers>
+                  {temperature(selected.maximum, unit)}
+                  {unit}
+                </Text>
+                <Heading level={2}>{selected.condition}</Heading>
+                <Stack direction="horizontal" gap={4} wrap="wrap">
+                  <Stack
+                    as="span"
+                    direction="horizontal"
+                    align="center"
+                    gap={1}
+                  >
+                    <Icon icon={ArrowUp} size="sm" />
+                    <Text>{temperature(selected.maximum, unit)} high</Text>
+                  </Stack>
+                  <Stack
+                    as="span"
+                    direction="horizontal"
+                    align="center"
+                    gap={1}
+                  >
+                    <Icon icon={ArrowDown} size="sm" />
+                    <Text>{temperature(selected.minimum, unit)} low</Text>
+                  </Stack>
+                </Stack>
+              </Stack>
+              <Stack
+                align="center"
+                justify="center"
+                minHeight={160}
+                xstyle={styles.sky}
+                aria-hidden="true"
+              >
+                <WeatherIcon code={selected.weatherCode} size="hero" />
+              </Stack>
+            </Grid>
+          </Card>
+
+          <Stack gap={4}>
+            <Stack
+              direction="horizontal"
+              justify="between"
+              align="center"
+              gap={3}
+              wrap="wrap"
+            >
+              <Heading level={2}>The days ahead</Heading>
+              <Text type="supporting" color="secondary">
+                {forecasts.length}-day forecast
+              </Text>
+            </Stack>
+            <RadioList
+              label="Forecast day"
+              isLabelHidden
+              value={selected.date}
+              onChange={setDate}
+            >
+              <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
+                {forecasts.map((day) => (
+                  <Card
+                    key={day.id}
+                    width={200}
+                    height="100%"
+                    variant={
+                      day.id === selected.id ? 'forecast-selected' : 'default'
+                    }
+                  >
+                    <RadioListItem
+                      value={day.date}
+                      align="first-line"
+                      label={dayLabel(day.date, 'long')}
+                      aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
+                      description={
+                        <Stack as="span" gap={4} paddingBlockStart={3}>
+                          <Stack as="span" align="center" gap={3}>
+                            <WeatherIcon code={day.weatherCode} />
+                            <Text size="xl" hasTabularNumbers>
+                              {temperature(day.maximum, unit)}{' '}
+                              <Text color="secondary">
+                                {temperature(day.minimum, unit)}
+                              </Text>
+                            </Text>
+                            <Text type="supporting" color="secondary">
+                              {day.condition}
+                            </Text>
+                          </Stack>
+                          <Stack
+                            as="span"
+                            direction="horizontal"
+                            align="center"
+                            justify="center"
+                            gap={1}
+                          >
+                            <Icon icon={Droplets} size="sm" />
+                            <Text type="supporting">
+                              {day.rain === null
+                                ? '—'
+                                : `${Math.round(day.rain)}%`}
+                            </Text>
+                          </Stack>
+                        </Stack>
+                      }
+                    />
+                  </Card>
+                ))}
+              </Carousel>
+            </RadioList>
+          </Stack>
+
+          <Section
+            dividers={['top', 'bottom']}
+            paddingBlock={5}
+            paddingInline={0}
+          >
+            <MetadataList columns="multi">
+              <MetadataListItem
+                label="Chance of rain"
+                icon={<Icon icon={Droplets} size="md" />}
+              >
+                {selected.rain === null
+                  ? 'Unavailable'
+                  : `${Math.round(selected.rain)}%`}
+              </MetadataListItem>
+              <MetadataListItem
+                label="Prevailing wind"
+                icon={<Icon icon={Wind} size="md" />}
+              >
+                {selected.windDirection || 'Unavailable'}
+              </MetadataListItem>
+              <MetadataListItem
+                label="Coordinates"
+                icon={<Icon icon={MapPin} size="md" />}
+              >
+                {location.latitude != null && location.longitude != null
+                  ? `${Math.abs(location.latitude).toFixed(2)}° ${location.latitude < 0 ? 'S' : 'N'} / ${Math.abs(location.longitude).toFixed(2)}° ${location.longitude < 0 ? 'W' : 'E'}`
+                  : 'Unavailable'}
+              </MetadataListItem>
+            </MetadataList>
+          </Section>
+          <Stack gap={3}>
+            <Stack
+              direction="horizontal"
+              justify="between"
+              align="center"
+              gap={4}
+              wrap="wrap"
+            >
+              <StackItem size="fill">
+                <Text as="p" type="supporting" color="secondary">
+                  Daily highs & lows, in °{unit}.{' '}
+                  {selected.updatedAt
+                    ? `Source updated ${formatTime(selected.updatedAt)}.`
+                    : 'Source update time unavailable.'}
+                  <br />
+                  {selected.fetchedAt
+                    ? `Retrieved ${formatTime(selected.fetchedAt)}. `
+                    : ''}
+                  Forecasts refresh every 5 minutes.
+                </Text>
+              </StackItem>
+              <Button
+                label="Refresh"
+                variant="ghost"
+                size="sm"
+                icon={<Icon icon={RefreshCw} size="sm" />}
+                onClick={() => void refresh()}
+                isLoading={refreshing}
+                isDisabled={!hydrated}
+              />
+            </Stack>
+            <Text as="p" type="supporting" color="secondary">
+              {selected.attribution}
+            </Text>
+          </Stack>
         </>
       )}
-      <div role="status" aria-live="polite">
-        {error && <p {...stylex.props(styles.error)}>{error}</p>}
-      </div>
-    </section>
+      {error && <Banner status="warning" title={error} />}
+    </Stack>
   );
 }
 
@@ -261,265 +339,14 @@ function formatTime(value: string) {
   }).format(new Date(value));
 }
 
+// Brand-specific artwork; layout, sizing, scrolling, and interaction belong
+// to Astryx. Component overrides and shared colors live in tempoTheme.ts.
 const styles = stylex.create({
-  eyebrow: {
-    color: '#697b70',
-    fontSize: 10,
-    letterSpacing: '1.8px',
-    fontWeight: 700,
-    marginBottom: 12,
-  },
-  muted: { color: '#65756e', fontSize: 11 },
-  content: { minWidth: 0 },
-  titleRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 16,
-    marginBottom: 27,
-  },
-  title: {
-    fontSize: { default: 52, '@media (max-width: 900px)': 42 },
-    fontWeight: 500,
-    letterSpacing: '-2.4px',
-    lineHeight: 1.05,
-  },
-  comma: { color: '#77935b' },
-  subtitle: { fontSize: 12, color: '#66766e', marginTop: 12 },
-  units: {
-    border: 0,
-    margin: 0,
-    display: 'flex',
-    backgroundColor: '#e8ebe3',
-    padding: 4,
-    borderRadius: 24,
-    alignSelf: 'center',
-    flexShrink: 0,
-  },
-  unit: {
-    cursor: 'pointer',
-    border: 0,
-    padding: '8px 12px',
-    borderRadius: 20,
-    fontSize: 11,
-    backgroundColor: 'transparent',
-    color: '#647368',
-  },
-  unitActive: { backgroundColor: '#243b37', color: '#fff' },
   hero: {
-    backgroundColor: '#203b40',
-    color: '#fff',
-    borderRadius: 16,
-    minHeight: 290,
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  heroCopy: {
-    padding: { default: 32, '@media (max-width: 900px)': 24 },
-    position: 'relative',
-    zIndex: 2,
-    gridColumn: '1 / -1',
-    gridRow: 1,
-  },
-  heroLabel: {
-    color: '#c8d7d5',
-    fontSize: 11,
-    display: 'flex',
-    gap: 12,
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  heroPill: {
-    padding: '5px 8px',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#728b85',
-    borderRadius: 20,
-    fontSize: 7,
-    letterSpacing: '1px',
-  },
-  heroTemp: {
-    fontSize: { default: 90, '@media (max-width: 900px)': 76 },
-    fontWeight: 400,
-    letterSpacing: '-6px',
-    lineHeight: 1.2,
-    marginTop: 20,
-  },
-  heroUnit: {
-    fontSize: 27,
-    color: '#bdceca',
-    letterSpacing: 0,
-    verticalAlign: 'top',
-    display: 'inline-block',
-    paddingTop: 15,
-    marginLeft: 4,
-  },
-  condition: {
-    color: '#fff',
-    fontSize: 17,
-    letterSpacing: '-0.3px',
-    maxWidth: '70%',
-  },
-  highLowItem: { display: 'flex', alignItems: 'center', gap: 4 },
-  highLow: {
-    display: 'flex',
-    gap: 18,
-    marginTop: 16,
-    color: '#c2d2cd',
-    fontSize: 11,
-    alignItems: 'center',
+    backgroundImage: 'var(--tempo-weather-glow)',
   },
   sky: {
-    position: 'relative',
-    gridColumn: 2,
-    gridRow: 1,
-    opacity: { default: 1, '@media (max-width: 500px)': 0.45 },
-    pointerEvents: 'none',
+    color: 'var(--tempo-weather-sky-color)',
+    backgroundImage: 'var(--tempo-weather-orbits)',
   },
-  sun: {
-    position: 'absolute',
-    width: 145,
-    height: 145,
-    borderRadius: '50%',
-    backgroundImage:
-      'linear-gradient(135deg, #f4e8ab 4%, #d7ce83 55%, #97ad83 100%)',
-    top: 56,
-    right: 44,
-    boxShadow: '0 0 70px #e8e5a31a',
-  },
-  orbit: {
-    position: 'absolute',
-    width: 340,
-    height: 340,
-    borderRadius: '50%',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#c6d8bd17',
-    right: -52,
-    top: -40,
-  },
-  orbitSmall: {
-    position: 'absolute',
-    width: 252,
-    height: 252,
-    borderRadius: '50%',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#c6d8bd17',
-    right: -8,
-    top: 4,
-  },
-  heroIcon: {
-    position: 'absolute',
-    top: 134,
-    right: 44,
-    color: '#f1f0db',
-    filter: 'drop-shadow(0 8px 12px #203b4055)',
-  },
-  skyCaption: {
-    position: 'absolute',
-    bottom: 26,
-    right: 30,
-    fontSize: 7,
-    letterSpacing: '2px',
-    color: '#a8c0b7',
-  },
-  sectionHeading: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 32,
-    marginBottom: 16,
-  },
-  sectionTitle: { fontSize: 18, fontWeight: 500, letterSpacing: '-0.5px' },
-  forecastGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-    gap: { default: 10, '@media (max-width: 1000px)': 6 },
-    overflowX: 'auto',
-  },
-  day: {
-    padding: { default: '18px 12px', '@media (max-width: 900px)': '16px 6px' },
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#dae0d6',
-    borderRadius: 11,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    color: '#263c35',
-    cursor: 'pointer',
-    backgroundColor: { default: '#f9faf5', ':hover': '#eaf0df' },
-    minWidth: 60,
-    transition: 'background-color 150ms',
-  },
-  dayActive: {
-    backgroundColor: { default: '#e4edce', ':hover': '#dce9be' },
-    borderColor: '#bacb9b',
-  },
-  dayName: { fontSize: 12, fontWeight: 700 },
-  dayDate: { fontSize: 10, color: '#607360', marginTop: 5 },
-  dayIcon: { color: '#637c50', marginBlock: 22 },
-  dayTemps: { fontSize: 20, letterSpacing: '-0.7px' },
-  lowTemp: { color: '#69786a', fontSize: 13, marginLeft: 4 },
-  rain: {
-    display: 'flex',
-    gap: 4,
-    alignItems: 'center',
-    fontSize: 10,
-    color: '#527774',
-    marginTop: 12,
-  },
-  details: {
-    display: 'grid',
-    gridTemplateColumns: {
-      default: '1fr 1fr 1.4fr',
-      '@media (max-width: 1000px)': '1fr 1fr',
-      '@media (max-width: 420px)': '1fr',
-    },
-    gap: 24,
-    marginBlock: 28,
-    paddingBlock: 24,
-    borderTopWidth: 1,
-    borderTopStyle: 'solid',
-    borderTopColor: '#d9ded7',
-    borderBottomWidth: 1,
-    borderBottomStyle: 'solid',
-    borderBottomColor: '#d9ded7',
-  },
-  detail: { display: 'flex', gap: 12, alignItems: 'center', color: '#5e7969' },
-  detailLabel: {
-    fontSize: 8,
-    letterSpacing: '1.2px',
-    color: '#5d7065',
-    marginBottom: 6,
-  },
-  detailValue: { fontSize: 20, fontWeight: 500, color: '#263d34' },
-  coordinate: { fontSize: 12, color: '#263d34' },
-  freshness: {
-    flexWrap: 'wrap',
-    display: 'flex',
-    gap: 16,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  freshnessText: {
-    flex: '1 1 230px',
-    fontSize: 10,
-    color: '#67786e',
-    lineHeight: 1.9,
-  },
-  attribution: { fontSize: 9, color: '#67786e', marginTop: 12 },
-  error: {
-    marginTop: 16,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: '#f4e4da',
-    color: '#7c3f28',
-    fontSize: 12,
-  },
-  empty: { paddingBlock: 60, lineHeight: 2 },
 });

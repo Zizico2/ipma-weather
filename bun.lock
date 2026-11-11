@@ -46,6 +46,7 @@
     },
   },
   "patchedDependencies": {
+    "@astryxdesign/cli@0.7.13": "patches/@astryxdesign%2Fcli@0.7.13.patch",
     "@opennextjs/cloudflare@1.20.16": "patches/@opennextjs%2Fcloudflare@1.20.16.patch",
   },
   "packages": {

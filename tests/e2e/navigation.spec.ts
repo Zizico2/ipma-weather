@@ -1,5 +1,6 @@
 import { instant } from '@next/playwright';
 import { expect, test } from '@playwright/test';
+import { closeLocationSearch, locationSearch } from './location-picker';
 
 test('city picker is interactive in the prerendered shell', async ({
   page,
@@ -9,7 +10,7 @@ test('city picker is interactive in the prerendered shell', async ({
     page,
     async () => {
       await page.goto('/weather/1131200');
-      const search = page.getByRole('searchbox', { name: 'Search locations' });
+      const search = await locationSearch(page);
       await expect(search).toBeVisible();
       await search.fill('faro');
       await expect(
@@ -21,6 +22,7 @@ test('city picker is interactive in the prerendered shell', async ({
       await expect(
         page.getByText('Loading the forecast from IPMA…'),
       ).toBeVisible();
+      await closeLocationSearch(page);
     },
     { baseURL },
   );
@@ -32,11 +34,13 @@ test('keeps the city search while navigating with forecast content paused', asyn
 }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
-  const search = page.getByRole('searchbox', { name: 'Search locations' });
+  const search = await locationSearch(page);
   await search.fill('por');
   await instant(page, async () => {
     await page.getByRole('link', { name: 'Porto', exact: true }).click();
     await page.waitForURL('**/weather/1131200');
+    await expect(page.getByRole('dialog', { name: 'Navigation' })).toBeHidden();
+    await locationSearch(page);
     await expect(search).toHaveValue('por');
     await expect(
       page.getByRole('link', { name: 'Porto', exact: true }),
@@ -45,9 +49,12 @@ test('keeps the city search while navigating with forecast content paused', asyn
     await expect(
       page.getByRole('link', { name: 'Faro', exact: true }),
     ).toBeVisible();
+    await closeLocationSearch(page);
   });
   await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
+  await locationSearch(page);
   await expect(search).toHaveValue('far');
+  await closeLocationSearch(page);
   await page.goBack();
   await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
   await expect(
@@ -55,6 +62,7 @@ test('keeps the city search while navigating with forecast content paused', asyn
       .getByRole('region', { name: 'Weather forecast' })
       .getByText('22°C', { exact: true }),
   ).toBeVisible();
+  await locationSearch(page);
   await expect(search).toHaveValue('far');
 });
 
@@ -68,7 +76,7 @@ for (const intent of ['hover', 'focus'] as const) {
     );
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
-    const search = page.getByRole('searchbox', { name: 'Search locations' });
+    const search = await locationSearch(page);
     await search.fill('far');
     const link = page.getByRole('link', { name: 'Faro', exact: true });
     const forecastPrefetch = page.waitForResponse(
@@ -91,6 +99,7 @@ for (const intent of ['hover', 'focus'] as const) {
           .getByRole('region', { name: 'Weather forecast' })
           .getByText('22°C', { exact: true }),
       ).toBeVisible();
+      await locationSearch(page);
       await expect(search).toHaveValue('far');
     });
   });

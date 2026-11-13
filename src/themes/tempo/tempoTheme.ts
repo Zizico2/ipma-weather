@@ -13,6 +13,10 @@ export const tempoTheme = defineTheme({
       'radial-gradient(circle at center, #f4e8ab18 0%, #f4e8ab08 48%, transparent 49%), radial-gradient(circle at center, transparent 65%, #c6d8bd26 66%, transparent 67%)',
     '--tempo-weather-icon-forecast': '2rem',
     '--tempo-weather-icon-hero': '7rem',
+    '--tempo-hour-width': '5.5rem',
+    '--tempo-hour-line': 'light-dark(#a86d20, #e9bd68)',
+    '--tempo-hour-fill': 'light-dark(#edc36b30, #edc36b18)',
+    '--tempo-hour-rain': 'light-dark(#3c7188, #99cddd)',
   },
   typography: {
     scale: { base: 14, ratio: 1.2 },

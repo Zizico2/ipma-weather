@@ -2,8 +2,11 @@
 
 A small weather app for Portugal, in its own repository. Search IPMA locations,
 explore the five-day forecast, select a day, switch °C/°F, and refresh.
-The hourly outlook offers “Next 10 hours” and “Today”, with local times,
-a temperature curve, weather conditions, wind and precipitation probability. Missing
+The main daily card leads the page. Beneath it, a compact hourly timeline offers
+“Next 10 hours” and “Today”. Swipe or use the arrow keys to browse local times,
+weather icons, temperatures, the connected temperature trace and rain chances.
+Tap an hour to see its conditions, wind and humidity. Source timestamps and
+attribution are available in the expandable “Source & details” section. Missing
 measurements stay missing; daily maximums are labelled as forecasts, not current
 observations. All weather data comes from the backend.
 
@@ -213,7 +216,8 @@ HTTP/2 gRPC fixture. It covers streamed server HTML with JS disabled, hydration,
 city navigation, units, day selection, refresh failure with retained data,
 empty/missing data, backend failure, and unknown locations. Hourly tests cover
 server HTML, both windows, shared units, hourly backend failure, refresh failure,
-and independent daily availability. Unit tests cover mixed periods, clock-window
+independent daily availability, hero-first ordering, touch/keyboard panning,
+hour selection and narrow-screen overflow. Unit tests cover mixed periods, clock-window
 gaps, midnight, Azores dates and repeated DST hours. With JS disabled,
 late Suspense HTML is present but React's reveal script cannot run.
 

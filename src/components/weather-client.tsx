@@ -126,8 +126,6 @@ function WeatherDashboard({
         </SegmentedControl>
       </Stack>
 
-      <TemperatureUnitContext value={unit}>{hourly}</TemperatureUnitContext>
-
       {!selected ? (
         <EmptyState
           title="No forecast published yet."
@@ -144,7 +142,13 @@ function WeatherDashboard({
         />
       ) : (
         <>
-          <Card variant="weather" padding={6} xstyle={styles.hero}>
+          <Card
+            variant="weather"
+            padding={6}
+            xstyle={styles.hero}
+            role="region"
+            aria-label="Daily weather outlook"
+          >
             <Grid columns={{ minWidth: 240, max: 2 }} gap={6} align="center">
               <Stack gap={4}>
                 <Stack
@@ -195,6 +199,8 @@ function WeatherDashboard({
               </Stack>
             </Grid>
           </Card>
+
+          <TemperatureUnitContext value={unit}>{hourly}</TemperatureUnitContext>
 
           <Stack gap={4}>
             <Stack
@@ -330,6 +336,9 @@ function WeatherDashboard({
             </Text>
           </Stack>
         </>
+      )}
+      {!selected && (
+        <TemperatureUnitContext value={unit}>{hourly}</TemperatureUnitContext>
       )}
       {error && <Banner status="warning" title={error} />}
     </Stack>

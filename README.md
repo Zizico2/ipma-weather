@@ -7,7 +7,7 @@ observations. All weather data comes from the backend.
 
 ## Run
 
-Requires Node.js 24+ and Bun 1.4.4. Start `ipma-proxy` on port 50051 first (run
+Requires Node.js 24 and Bun 1.4.4. Start `ipma-proxy` on port 50051 first (run
 `cargo run --locked` in that repository), then:
 
 ```sh
@@ -92,36 +92,24 @@ forcing a new IPMA request. Locations revalidate daily and descriptions use the
 Tags identify each city forecast and the location catalogue for future
 invalidation. No public cache invalidation endpoint is exposed.
 
-On Workers, `experimental.disableResumeDataCacheCompression` avoids a workerd
-`RangeError` when Next restores a compressed Resume Data Cache using
-`inflateSync` with an unsupported output limit. Without it, a successful static
-shell can leave the forecast stuck on “Looking at the skies.” Build and deploy
-together so the persisted resume state and runtime use the same format.
+Cache Components, Partial Prefetching and intent prefetching use the standard
+Node.js runtime. No runtime adapter, dependency patches, gRPC-Web translation,
+or custom cache backend is required.
 
-The pinned Cloudflare adapter also carries the scheduler and request-isolation
-patches documented in
-[patches/README.md](patches/README.md). It prevents incomplete runtime prefetches
-and stalled navigation streams on workerd while preserving Cache Components and
-intent prefetching. Bun applies it automatically during a frozen-lockfile install.
-
-All requested framework features remain enabled. The two deliberate dependency
-choices are TanStack DB's current RC for native SSR support, and the community
-StyleX SWC integration to retain the native Next compiler pipeline. Astryx is
-currently beta. The experimental Next options above handle Workers resume
-compatibility and completed-visit reuse.
-
-## Cloudflare deployment ownership
+## Vercel deployment ownership
 
 Hosted deployment is owned by [ipma-infra](https://github.com/Zizico2/ipma-infra),
-including the Worker name, account, gateway URL, KV namespace, bindings and manual
-approval workflow. This repository owns Next/OpenNext configuration and pinned
-build tools. Its `wrangler.toml` is local-only: `ipma-weather-local`, loopback
-backend and an emulated KV namespace. It contains no hosted account or resource ID.
+including the pinned app revision, Vercel project selection, build artifact and
+manual approval workflow. This repository owns the standard Next.js build and
+Bun lockfile. Node.js 24 is selected through `engines.node`.
 
-Use `bun run build:cf` and `bun run preview` locally. Hosted builds and deployments
-run the standard OpenNext CLI from the infra pipeline, using an external `--config`.
-There are no app-repository `deploy:cf` or `upload:cf` scripts. See
-[the deployment instructions](https://github.com/Zizico2/ipma-infra/blob/main/providers/cloudflare/README.md).
+Set the server-only `IPMA_GRPC_URL` in the Vercel project's Preview and Production
+environments to their HTTPS native gRPC gateway origins. Both build-time
+prerendering and runtime requests need access to that backend. Staging maps to
+Vercel Preview; production maps to Vercel Production. Vercel owns the framework
+cache; there are no KV bindings or Workers configuration files.
+
+See [the deployment instructions](https://github.com/Zizico2/ipma-infra/blob/main/providers/vercel/README.md).
 
 ## Generate the client
 
@@ -175,21 +163,12 @@ bun run build
 bun run check:client
 ```
 
-`bun run test:e2e:worker` additionally builds the Cloudflare bundle and runs
-desktop/mobile Chromium and desktop Firefox against Wrangler on **8788**
-(install them with `bunx playwright install chromium firefox`). It exercises the actual
-Workers runtime, including initial forecast streaming and revisiting cities
-after a minute with forecast/page requests blocked. Set `WORKER_GRPC_URL` to a
-reachable HTTPS gateway for runtime preview requests; this overrides the
-loopback-only local Wrangler setting. The build separately needs a reachable
-native backend through `IPMA_GRPC_URL`, as with `build:cf`. Preview state is
-isolated under `.data/worker-preview`. These tests are separate from the
-self-contained gRPC fixture suite below.
-
-Set `WORKER_TEST_URL` when running `bunx playwright test --config
-playwright.worker.config.ts` to target an already-deployed Worker instead of
-starting Wrangler. This is important for cache-fill isolation failures that
-can reproduce remotely while the same local workload passes.
+`DEPLOYED_TEST_URL=https://your-deployment.vercel.app bun run test:e2e:deployed`
+runs desktop/mobile Chromium against an existing deployment. It covers initial
+streaming, overlapping prefetches, city navigation and revisiting cached cities
+with network requests blocked. For protected Preview deployments, provide
+`VERCEL_AUTOMATION_BYPASS_SECRET`; the suite sends Vercel's automation bypass
+header. No local preview adapter or live backend is needed for the fixture suite.
 
 Vitest covers protobuf-to-DTO mapping, zero and absent values, civil dates,
 weather codes, API validation/errors, and DB hydration/request isolation.
@@ -208,7 +187,7 @@ Only the production test build enables `EXPOSE_TESTING_API=1`; normal builds
 keep Next's testing API disabled.
 
 E2E runs its own gRPC server on **50061** and Next on **3001**, with a separate
-`.next-e2e` build directory. The fixture is test-only; the app never falls back
+`build/e2e` build directory. The fixture is test-only; the app never falls back
 to sample data. No live IPMA service or Rust build is required for the tests.
 
 ## References

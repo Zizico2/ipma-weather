@@ -1,7 +1,6 @@
 node_modules/
-.open-next/
 .next/
-.next-e2e/
+build/
 .data/
 .env*
 !.env.example
@@ -10,4 +9,4 @@ test-results/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
-.wrangler/
+.vercel/

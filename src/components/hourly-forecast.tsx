@@ -175,7 +175,7 @@ function HourlyOutlook({
       </Stack>
       {selected ? (
         <Stack gap={0} xstyle={styles.surface}>
-          <Stack padding={2}>
+          <Stack padding={1}>
             <Carousel
               key={view}
               aria-label="Hourly forecasts"
@@ -418,7 +418,7 @@ const styles = stylex.create({
   },
   hour: {
     width:
-      'max(var(--tempo-hour-width), calc((100cqi - 2 * var(--spacing-2)) / 10))',
+      'max(var(--tempo-hour-width), calc((100cqi - 2 * var(--spacing-1)) / 10))',
     flexShrink: 0,
     padding: 0,
     appearance: 'none',

@@ -140,7 +140,9 @@ Vercel builds branch pushes and posts the preview URL/status on the pull request
 keeps production under the infra release workflow. Preview builds use the
 Preview gateway variables above and retain Vercel deployment protection and
 Git Fork Protection. No Vercel deployment token is needed in this repository's
-GitHub Actions, and the existing fixture-based CI continues independently.
+GitHub Actions, and the existing fixture-based CI continues independently. See
+[Vercel's GitHub preview guide](https://vercel.com/docs/git/vercel-for-github#preview-urls-for-the-latest-changes-for-each-pull-request)
+for the native deployment and MR notification behaviour.
 
 See [the deployment instructions](https://github.com/Zizico2/ipma-infra/blob/main/providers/vercel/README.md).
 

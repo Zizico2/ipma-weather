@@ -7,8 +7,6 @@
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "build:cf": "opennextjs-cloudflare build",
     "start": "next start --hostname 127.0.0.1",
     "lint": "biome check .",
     "format": "biome check --write .",
@@ -17,12 +15,12 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:production": "E2E_PRODUCTION=1 playwright test",
-    "test:e2e:worker": "bun run build:cf && playwright test --config playwright.worker.config.ts",
+    "test:e2e:deployed": "playwright test --config playwright.deployed.config.ts",
     "proto:generate": "bun scripts/generate-proto.ts",
     "check:client": "bun scripts/check-client-bundle.ts",
     "theme:build": "bun run astryx theme build src/themes/tempo/tempoTheme.ts --out src/themes/tempo/generated/tempo.css",
     "theme:check": "bun run theme:build --check",
-    "astryx:doctor": "bun run astryx doctor --built .",
+    "astryx:doctor": "bun run astryx doctor --built .next",
     "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs"
   },
   "dependencies": {
@@ -31,9 +29,7 @@
     "@bufbuild/protobuf": "2.17.0",
     "@connectrpc/connect": "2.3.0",
     "@connectrpc/connect-node": "2.3.0",
-    "@connectrpc/connect-web": "2.3.0",
     "@hono/vercel": "^1.0.1",
-    "@opennextjs/cloudflare": "1.20.16",
     "@stylexjs/stylex": "0.19.1",
     "@tanstack/db": "1.0.0-rc.1.4",
     "@tanstack/query-core": "5.107.1",
@@ -61,11 +57,9 @@
     "babel-plugin-react-compiler": "1.0.0",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vitest": "5.1.0",
-    "wrangler": "4.160.0"
+    "vitest": "5.1.0"
   },
-  "patchedDependencies": {
-    "@opennextjs/cloudflare@1.20.16": "patches/@opennextjs%2Fcloudflare@1.20.16.patch",
-    "@astryxdesign/cli@0.7.13": "patches/@astryxdesign%2Fcli@0.7.13.patch"
+  "engines": {
+    "node": "24.x"
   }
 }

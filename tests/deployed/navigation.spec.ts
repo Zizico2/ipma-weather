@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test';
 import { locationSearch } from '../e2e/location-picker';
 
 for (const intent of ['hover', 'focus'] as const) {
-  test(`Worker completes new city visits after ${intent}`, async ({ page }) => {
+  test(`deployment completes new city visits after ${intent}`, async ({
+    page,
+  }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Lisboa,' })).toBeVisible();
     await page.waitForLoadState('networkidle');
@@ -86,7 +88,7 @@ test('overlapping navigations and runtime prefetches complete their forecast sta
   );
 });
 
-test('Worker resumes the forecast and reuses visited cities without the network', async ({
+test('deployment resumes the forecast and reuses visited cities without the network', async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -100,7 +102,7 @@ test('Worker resumes the forecast and reuses visited cities without the network'
   await page.waitForLoadState('networkidle');
   await page.clock.fastForward(61_000);
 
-  // A visited city must render from the router cache even if the Worker is
+  // A visited city must render from the router cache even if the deployment is
   // unreachable. This catches bugs hidden by fast responses from next start.
   await page.route('**/weather/**', (route) => route.abort());
   await page.route('**/api/**', (route) => route.abort());

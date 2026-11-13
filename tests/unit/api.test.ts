@@ -3,6 +3,7 @@ import { createWeatherApi } from '../../src/server/api';
 
 describe('Hono API', () => {
   const service = {
+    getHourlyForecast: vi.fn(async () => []),
     getLocations: vi.fn(async () => [
       { id: 1110600, name: 'Lisboa', latitude: null, longitude: null },
     ]),
@@ -18,6 +19,15 @@ describe('Hono API', () => {
     expect((await app.request('/api/forecasts/123')).status).toBe(404));
   it('returns forecast DTOs for valid locations', async () => {
     const response = await app.request('/api/forecasts/1110600');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual([]);
+  });
+  it('validates hourly requests and returns independent DTOs', async () => {
+    service.getHourlyForecast.mockClear();
+    expect((await app.request('/api/hourly-forecasts/1e6')).status).toBe(400);
+    expect((await app.request('/api/hourly-forecasts/123')).status).toBe(404);
+    expect(service.getHourlyForecast).not.toHaveBeenCalled();
+    const response = await app.request('/api/hourly-forecasts/1110600');
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual([]);
   });

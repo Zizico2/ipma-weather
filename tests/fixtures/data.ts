@@ -63,3 +63,55 @@ export function fixtureForecast(
           })),
   };
 }
+
+export function fixtureHourlyForecast(
+  locationId: number,
+): import('@bufbuild/protobuf').MessageInitShape<
+  typeof import('../../src/server/gen/ipma/public_data/v1/public_data_pb').GetForecastResponseSchema
+> {
+  // Relative to the fixture server's clock, so browser windows remain meaningful.
+  const first = Math.ceil(Date.now() / 3_600_000) * 3_600_000;
+  return {
+    metadata: {
+      attribution: 'IPMA, I.P. (hourly test fixture)',
+      sourceUrl: `https://api.ipma.pt/public-data/forecast/aggregate/${locationId}.json`,
+      fetchedAt: timestampFromDate(new Date(first - 3_600_000)),
+    },
+    forecasts:
+      locationId === 1060500
+        ? []
+        : [
+            ...Array.from({ length: 48 }, (_, index) => ({
+              locationId,
+              forecastAt: timestampFromDate(
+                new Date(first + index * 3_600_000),
+              ),
+              periodHours: 1,
+              temperatureCelsius:
+                locationId === 1090700
+                  ? undefined
+                  : index === 0
+                    ? 0
+                    : 12 + (index % 8),
+              relativeHumidityPercent: 65,
+              windSpeedKilometersPerHour: index === 0 ? 0 : 14,
+              windDirection: 'NW',
+              weatherTypeCode: index % 2 ? 7 : 1,
+              precipitationProbabilityPercent: index === 0 ? 0 : 20,
+              upstreamUpdatedAt: timestampFromDate(new Date(first - 7_200_000)),
+            })),
+            {
+              locationId,
+              forecastAt: timestampFromDate(new Date(first)),
+              periodHours: 3,
+              temperatureCelsius: 99,
+            },
+            {
+              locationId,
+              forecastAt: timestampFromDate(new Date(first)),
+              periodHours: 24,
+              temperatureCelsius: 98,
+            },
+          ],
+  };
+}

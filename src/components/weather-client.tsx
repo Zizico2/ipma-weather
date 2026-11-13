@@ -36,26 +36,35 @@ import {
   RefreshCw,
   Wind,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { forecastCollection, forecastQuery } from '../lib/collections';
 import { dayLabel, temperature, type WeatherLocation } from '../lib/weather';
+import { TemperatureUnitContext } from './temperature-unit';
 import { WeatherIcon } from './weather-icon';
 
 export function WeatherClient({
   location,
   state,
+  hourly,
 }: {
   location: WeatherLocation;
   state: DehydratedDbState;
+  hourly: ReactNode;
 }) {
   return (
     <HydrationBoundary state={state}>
-      <WeatherDashboard location={location} />
+      <WeatherDashboard location={location} hourly={hourly} />
     </HydrationBoundary>
   );
 }
 
-function WeatherDashboard({ location }: { location: WeatherLocation }) {
+function WeatherDashboard({
+  location,
+  hourly,
+}: {
+  location: WeatherLocation;
+  hourly: ReactNode;
+}) {
   const db = useDbClient();
   const [descriptor] = useState(() => forecastCollection(location.id));
   const { data: forecasts } = useLiveQuery({
@@ -95,7 +104,7 @@ function WeatherDashboard({ location }: { location: WeatherLocation }) {
       >
         <Stack gap={2}>
           <Text type="label" color="secondary">
-            Your daily outlook
+            Your weather outlook
           </Text>
           <Heading level={1} type="display-2">
             {location.name},
@@ -116,6 +125,8 @@ function WeatherDashboard({ location }: { location: WeatherLocation }) {
           <SegmentedControlItem value="F" label="°F" />
         </SegmentedControl>
       </Stack>
+
+      <TemperatureUnitContext value={unit}>{hourly}</TemperatureUnitContext>
 
       {!selected ? (
         <EmptyState

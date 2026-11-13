@@ -16,6 +16,7 @@ describe('TanStack DB request isolation and hydration', () => {
       [],
     );
     const loader = {
+      hourlyForecast: async () => [],
       locations: async () => [
         { id: 1110600, name: 'Lisboa', latitude: null, longitude: null },
       ],

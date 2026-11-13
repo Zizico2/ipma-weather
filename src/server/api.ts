@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
-import type { Forecast, WeatherLocation } from '../lib/weather';
+import type { Forecast, HourlyForecast, WeatherLocation } from '../lib/weather';
 import { parseLocationId } from '../lib/weather';
 
 export interface WeatherService {
+  getHourlyForecast(id: number): Promise<HourlyForecast[]>;
   getLocations(): Promise<WeatherLocation[]>;
   getForecast(id: number): Promise<Forecast[]>;
 }
@@ -18,6 +19,14 @@ export function createWeatherApi(service: WeatherService) {
       if (!locations.some((location) => location.id === id))
         return c.json({ error: 'Location not found.' }, 404);
       return c.json(await service.getForecast(id), 200);
+    })
+    .get('/hourly-forecasts/:id', async (c) => {
+      const id = parseLocationId(c.req.param('id'));
+      if (id === null) return c.json({ error: 'Invalid location ID.' }, 400);
+      const locations = await service.getLocations();
+      if (!locations.some((location) => location.id === id))
+        return c.json({ error: 'Location not found.' }, 404);
+      return c.json(await service.getHourlyForecast(id), 200);
     })
     .notFound((c) => c.json({ error: 'API route not found.' }, 404))
     .onError((error, c) => {

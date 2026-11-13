@@ -22,6 +22,7 @@ jobs:
       - name: Build against the deterministic gRPC fixture
         env:
           IPMA_GRPC_URL: http://127.0.0.1:50061
+          IPMA_PUBLIC_DATA_GRPC_URL: http://127.0.0.1:50061
         run: |
           node --import tsx tests/fixtures/grpc-server.ts &
           fixture_pid=$!

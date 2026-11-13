@@ -9,7 +9,7 @@ async function check(directory: string): Promise<number> {
     else if (entry.name.endsWith('.js')) {
       const source = await readFile(path, 'utf8');
       if (
-        /ipma\.proxy\.v1|createGrpcTransport|@connectrpc\/connect-node|node:http2|GetWeatherForecastRequest|Invalid location ID|Weather backend request failed/.test(
+        /ipma\.proxy\.v1|ipma\.public_data\.v1|GetForecastRequest|IPMA_PUBLIC_DATA_GRPC_URL|createGrpcTransport|@connectrpc\/connect-node|node:http2|GetWeatherForecastRequest|Invalid location ID|Weather backend request failed/.test(
           source,
         )
       ) {

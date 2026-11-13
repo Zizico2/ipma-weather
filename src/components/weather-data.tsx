@@ -1,7 +1,15 @@
 import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
+import { Suspense } from 'react';
 import { createWeatherDb, forecastQuery } from '../lib/collections';
-import { getForecast, getLocations } from '../server/weather';
+import {
+  getForecast,
+  getHourlyForecast,
+  getLocations,
+} from '../server/weather';
+import { HourlyData } from './hourly-data';
+import { HourlyLoading } from './hourly-forecast';
 import { RememberLocation } from './remember-location';
 import { WeatherClient } from './weather-client';
 
@@ -11,12 +19,25 @@ export async function CityForecast({ locationId }: { locationId: number }) {
   return (
     <>
       <RememberLocation locationId={locationId} />
-      <WeatherData locationId={locationId} />
+      <WeatherData
+        locationId={locationId}
+        hourly={
+          <Suspense fallback={<HourlyLoading />}>
+            <HourlyData locationId={locationId} />
+          </Suspense>
+        }
+      />
     </>
   );
 }
 
-export async function WeatherData({ locationId }: { locationId: number }) {
+export async function WeatherData({
+  locationId,
+  hourly,
+}: {
+  locationId: number;
+  hourly: ReactNode;
+}) {
   'use cache';
   // DB preloading records timestamps internally. Cache the serialized snapshot
   // together with the data so it is safe to include in Next's prerendered shell.
@@ -27,6 +48,7 @@ export async function WeatherData({ locationId }: { locationId: number }) {
   const forecasts = await getForecast(locationId);
   // Each server render owns its DB and QueryClient. No process-wide collection state.
   const { db, queryClient } = createWeatherDb({
+    hourlyForecast: getHourlyForecast,
     locations: async () => locations,
     forecast: async () => forecasts,
   });
@@ -36,6 +58,7 @@ export async function WeatherData({ locationId }: { locationId: number }) {
       <WeatherClient
         key={locationId}
         location={location}
+        hourly={hourly}
         state={db.dehydrate({ shouldDehydrateCollection: () => false })}
       />
     );

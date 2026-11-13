@@ -31,6 +31,7 @@ const forecast: Forecast = {
 
 describe('weather RPC client', () => {
   const service = {
+    getHourlyForecast: vi.fn(async () => []),
     getLocations: vi.fn(async () => [location]),
     getForecast: vi.fn(async () => [forecast]),
   };
@@ -56,6 +57,7 @@ describe('weather RPC client', () => {
   it('returns the JSON the route handlers declare', async () => {
     expect(await client.locations()).toEqual([location]);
     expect(await client.forecast(1110600)).toEqual([forecast]);
+    expect(await client.hourlyForecast(1110600)).toEqual([]);
   });
 
   it('turns non-OK responses into the client error', async () => {

@@ -121,7 +121,7 @@ or custom cache backend is required.
 
 ## Vercel deployment ownership
 
-Hosted deployment is owned by [ipma-infra](https://github.com/Zizico2/ipma-infra),
+Release deployment is owned by [ipma-infra](https://github.com/Zizico2/ipma-infra),
 including the pinned app revision, Vercel project selection, build artifact and
 manual approval workflow. This repository owns the standard Next.js build and
 Bun lockfile. Node.js 24 is selected through `engines.node`.
@@ -133,6 +133,14 @@ gateway HTTPS origin before deploying this feature. Both build-time
 prerendering and runtime requests need access to that backend. Staging maps to
 Vercel Preview; production maps to Vercel Production. Vercel owns the framework
 cache; there are no KV bindings or Workers configuration files.
+
+The same Vercel project is connected to this GitHub repository for MR previews.
+Vercel builds branch pushes and posts the preview URL/status on the pull request.
+`vercel.json` disables automatic deployments from `main`; merging a PR therefore
+keeps production under the infra release workflow. Preview builds use the
+Preview gateway variables above and retain Vercel deployment protection and
+Git Fork Protection. No Vercel deployment token is needed in this repository's
+GitHub Actions, and the existing fixture-based CI continues independently.
 
 See [the deployment instructions](https://github.com/Zizico2/ipma-infra/blob/main/providers/vercel/README.md).
 

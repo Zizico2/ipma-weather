@@ -174,73 +174,75 @@ function HourlyOutlook({
         </SegmentedControl>
       </Stack>
       {selected ? (
-        <Stack gap={0} paddingBlockStart={2} xstyle={styles.surface}>
-          <Carousel
-            key={view}
-            aria-label="Hourly forecasts"
-            gap={0}
-            hasSnap={snapPaging}
-            hasEdgeFade={false}
-          >
-            {rows.map((row, index) => {
-              const date = new Date(row.forecastAt);
-              const day = localDate(row.forecastAt, timeZone);
-              const previousDay = index
-                ? localDate(rows[index - 1].forecastAt, timeZone)
-                : null;
-              const dayLabel =
-                day === localDate(now, timeZone) ? 'Today' : 'Tomorrow';
-              return (
-                <button
-                  key={row.id}
-                  type="button"
-                  {...stylex.props(
-                    styles.hour,
-                    row.id === selected.id && styles.selectedHour,
-                  )}
-                  aria-label={`${fullFormat.format(date)}, ${row.condition}, ${temperature(row.temperature, unit)}${unit}`}
-                  aria-pressed={row.id === selected.id}
-                  disabled={!hydrated}
-                  onClick={() => setSelectedId(row.id)}
-                >
-                  <Stack gap={2} align="center" paddingBlock={3}>
-                    <Text type="supporting" color="secondary">
-                      {day !== previousDay ? dayLabel : ' '}
-                    </Text>
-                    <Text type="label" hasTabularNumbers>
-                      {hourFormat.format(date)}
-                    </Text>
-                    <Stack xstyle={styles.weatherIcon}>
-                      <WeatherIcon code={row.weatherCode} />
-                    </Stack>
-                    <Text size="xl" weight="semibold" hasTabularNumbers>
-                      {temperature(row.temperature, unit)}
-                    </Text>
-                    <HourCurve
-                      row={row}
-                      previous={rows[index - 1]}
-                      next={rows[index + 1]}
-                      minimum={minimum}
-                      range={range}
-                    />
-                    <Stack
-                      direction="horizontal"
-                      align="center"
-                      gap={1}
-                      xstyle={styles.rain}
-                    >
-                      <Icon icon={Droplets} size="xsm" />
-                      <Text type="supporting" hasTabularNumbers>
-                        {row.rainProbability === null
-                          ? '—'
-                          : `${Math.round(row.rainProbability)}%`}
+        <Stack gap={0} xstyle={styles.surface}>
+          <Stack padding={2}>
+            <Carousel
+              key={view}
+              aria-label="Hourly forecasts"
+              gap={0}
+              hasSnap={snapPaging}
+              hasEdgeFade={false}
+            >
+              {rows.map((row, index) => {
+                const date = new Date(row.forecastAt);
+                const day = localDate(row.forecastAt, timeZone);
+                const previousDay = index
+                  ? localDate(rows[index - 1].forecastAt, timeZone)
+                  : null;
+                const dayLabel =
+                  day === localDate(now, timeZone) ? 'Today' : 'Tomorrow';
+                return (
+                  <button
+                    key={row.id}
+                    type="button"
+                    {...stylex.props(
+                      styles.hour,
+                      row.id === selected.id && styles.selectedHour,
+                    )}
+                    aria-label={`${fullFormat.format(date)}, ${row.condition}, ${temperature(row.temperature, unit)}${unit}`}
+                    aria-pressed={row.id === selected.id}
+                    disabled={!hydrated}
+                    onClick={() => setSelectedId(row.id)}
+                  >
+                    <Stack gap={2} align="center" paddingBlock={3}>
+                      <Text type="supporting" color="secondary">
+                        {day !== previousDay ? dayLabel : ' '}
                       </Text>
+                      <Text type="label" hasTabularNumbers>
+                        {hourFormat.format(date)}
+                      </Text>
+                      <Stack xstyle={styles.weatherIcon}>
+                        <WeatherIcon code={row.weatherCode} />
+                      </Stack>
+                      <Text size="xl" weight="semibold" hasTabularNumbers>
+                        {temperature(row.temperature, unit)}
+                      </Text>
+                      <HourCurve
+                        row={row}
+                        previous={rows[index - 1]}
+                        next={rows[index + 1]}
+                        minimum={minimum}
+                        range={range}
+                      />
+                      <Stack
+                        direction="horizontal"
+                        align="center"
+                        gap={1}
+                        xstyle={styles.rain}
+                      >
+                        <Icon icon={Droplets} size="xsm" />
+                        <Text type="supporting" hasTabularNumbers>
+                          {row.rainProbability === null
+                            ? '—'
+                            : `${Math.round(row.rainProbability)}%`}
+                        </Text>
+                      </Stack>
                     </Stack>
-                  </Stack>
-                </button>
-              );
-            })}
-          </Carousel>
+                  </button>
+                );
+              })}
+            </Carousel>
+          </Stack>
           <Stack
             padding={3}
             gap={2}
@@ -416,7 +418,7 @@ const styles = stylex.create({
   },
   hour: {
     width:
-      'max(var(--tempo-hour-width), calc((100cqi - var(--spacing-1)) / 10))',
+      'max(var(--tempo-hour-width), calc((100cqi - 2 * var(--spacing-2)) / 10))',
     flexShrink: 0,
     padding: 0,
     appearance: 'none',

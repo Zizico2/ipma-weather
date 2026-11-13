@@ -26,6 +26,11 @@ for (const intent of ['hover', 'focus'] as const) {
       await expect(
         page.getByText('Loading the forecast from IPMA…'),
       ).toBeHidden();
+      // A cached navigation can finish before the mobile drawer exit animation.
+      // Wait for it to close before opening the next city's search.
+      await expect(
+        page.getByRole('dialog', { name: 'Navigation' }),
+      ).toBeHidden();
     }
   });
 }
@@ -103,6 +108,7 @@ test('Worker resumes the forecast and reuses visited cities without the network'
   await page.getByRole('link', { name: 'Aveiro', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Aveiro,' })).toBeVisible();
   await expect(page.getByText('Loading the forecast from IPMA…')).toBeHidden();
+  await expect(page.getByRole('dialog', { name: 'Navigation' })).toBeHidden();
   await locationSearch(page);
   await page.getByRole('link', { name: 'Beja', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Beja,' })).toBeVisible();

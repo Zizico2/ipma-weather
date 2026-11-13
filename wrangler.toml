@@ -1,11 +1,12 @@
+# Local build/preview only. Hosted configuration and deployments live in ipma-infra.
 "$schema" = "./node_modules/wrangler/config-schema.json"
 main = ".open-next/worker.js"
-name = "ipma-weather"
+name = "ipma-weather-local"
 compatibility_date = "2026-11-11"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
 [vars]
-IPMA_GRPC_URL = "https://ipma-gateway-staging-632nxwkrka-no.a.run.app:443"
+IPMA_GRPC_URL = "http://127.0.0.1:50051"
 
 [assets]
 directory = ".open-next/assets"
@@ -13,11 +14,11 @@ binding = "ASSETS"
 
 [[kv_namespaces]]
 binding = "NEXT_INC_CACHE_KV"
-id = "e613ff109f764bb7b1e53b77955d4f83"
+id = "00000000000000000000000000000000"
 
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "ipma-weather"
+service = "ipma-weather-local"
 
 [observability]
 

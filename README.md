@@ -110,6 +110,19 @@ StyleX SWC integration to retain the native Next compiler pipeline. Astryx is
 currently beta. The experimental Next options above handle Workers resume
 compatibility and completed-visit reuse.
 
+## Cloudflare deployment ownership
+
+Hosted deployment is owned by [ipma-infra](https://github.com/Zizico2/ipma-infra),
+including the Worker name, account, gateway URL, KV namespace, bindings and manual
+approval workflow. This repository owns Next/OpenNext configuration and pinned
+build tools. Its `wrangler.toml` is local-only: `ipma-weather-local`, loopback
+backend and an emulated KV namespace. It contains no hosted account or resource ID.
+
+Use `bun run build:cf` and `bun run preview` locally. Hosted builds and deployments
+run the standard OpenNext CLI from the infra pipeline, using an external `--config`.
+There are no app-repository `deploy:cf` or `upload:cf` scripts. See
+[the deployment instructions](https://github.com/Zizico2/ipma-infra/blob/main/providers/cloudflare/README.md).
+
 ## Generate the client
 
 The complete schema snapshot is vendored from a pinned `ipma-proto` commit;
@@ -166,9 +179,11 @@ bun run check:client
 desktop/mobile Chromium and desktop Firefox against Wrangler on **8788**
 (install them with `bunx playwright install chromium firefox`). It exercises the actual
 Workers runtime, including initial forecast streaming and revisiting cities
-after a minute with forecast/page requests blocked. These integration tests use
-the gateway configured in `wrangler.toml`; the build also needs a reachable
-backend (`IPMA_GRPC_URL`, as with `build:cf`). They are separate from the
+after a minute with forecast/page requests blocked. Set `WORKER_GRPC_URL` to a
+reachable HTTPS gateway for runtime preview requests; this overrides the
+loopback-only local Wrangler setting. The build separately needs a reachable
+native backend through `IPMA_GRPC_URL`, as with `build:cf`. Preview state is
+isolated under `.data/worker-preview`. These tests are separate from the
 self-contained gRPC fixture suite below.
 
 Set `WORKER_TEST_URL` when running `bunx playwright test --config

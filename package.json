@@ -9,8 +9,6 @@
     "build": "next build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "build:cf": "opennextjs-cloudflare build",
-    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "upload:cf": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "start": "next start --hostname 127.0.0.1",
     "lint": "biome check .",
     "format": "biome check --write .",

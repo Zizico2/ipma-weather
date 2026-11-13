@@ -26,6 +26,7 @@ export default defineConfig({
       url: 'http://127.0.0.1:3001',
       env: {
         IPMA_GRPC_URL: 'http://127.0.0.1:50061',
+        IPMA_PUBLIC_DATA_GRPC_URL: 'http://127.0.0.1:50061',
         NEXT_DIST_DIR: 'build/e2e',
         EXPOSE_TESTING_API: production ? '1' : '0',
       },

@@ -2,11 +2,22 @@ import { Code, ConnectError } from '@connectrpc/connect';
 import { connectNodeAdapter } from '@connectrpc/connect-node';
 import { createServer } from 'http2';
 import { ProxyService } from '../../src/server/gen/ipma/proxy/v1/proxy_pb';
-import { fixtureForecast, locations } from './data';
+import { PublicDataService } from '../../src/server/gen/ipma/public_data/v1/public_data_pb';
+import { fixtureForecast, fixtureHourlyForecast, locations } from './data';
 
 const server = createServer(
   connectNodeAdapter({
     routes(router) {
+      router.service(PublicDataService, {
+        getForecast: (request) => {
+          if (request.locationId === 1080500)
+            throw new ConnectError(
+              'Hourly fixture unavailable',
+              Code.Unavailable,
+            );
+          return fixtureHourlyForecast(request.locationId);
+        },
+      });
       router.service(ProxyService, {
         ping: () => ({ message: 'fixture ready' }),
         getLocations: () => ({ locations }),

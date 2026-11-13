@@ -1,8 +1,8 @@
 import 'server-only';
 import { cacheLife, cacheTag } from 'next/cache';
 import { CodeTableKind, LocationKind } from './gen/ipma/proxy/v1/proxy_pb';
-import { grpc } from './grpc';
-import { mapForecasts, mapLocation } from './mappers';
+import { grpc, publicDataGrpc } from './grpc';
+import { mapForecasts, mapHourlyForecasts, mapLocation } from './mappers';
 
 export async function getLocations() {
   'use cache';
@@ -34,4 +34,15 @@ export async function getForecast(locationId: number) {
     getWeatherCodes(),
   ]);
   return mapForecasts(response, codes);
+}
+
+export async function getHourlyForecast(locationId: number) {
+  'use cache';
+  cacheLife({ stale: 60, revalidate: 300, expire: 1800 });
+  cacheTag(`hourly-weather:${locationId}`);
+  const [response, codes] = await Promise.all([
+    publicDataGrpc.getForecast({ locationId }),
+    getWeatherCodes(),
+  ]);
+  return mapHourlyForecasts(response, codes, locationId);
 }

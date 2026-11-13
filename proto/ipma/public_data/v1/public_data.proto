@@ -1,0 +1,104 @@
+syntax = "proto3";
+package ipma.public_data.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// IPMA website feeds. Independent from the documented open-data API.
+service PublicDataService {
+  rpc Ping(PingRequest) returns (PingResponse);
+  rpc GetForecast(GetForecastRequest) returns (GetForecastResponse);
+  rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse);
+  rpc GetDistricts(GetDistrictsRequest) returns (GetDistrictsResponse);
+  rpc GetWarnings(GetWarningsRequest) returns (GetWarningsResponse);
+}
+message PingRequest {}
+message PingResponse {
+  string message = 1;
+}
+message SourceMetadata {
+  string source_url = 1;
+  google.protobuf.Timestamp fetched_at = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  optional google.protobuf.Timestamp upstream_updated_at = 4;
+  string attribution = 5;
+}
+message GetForecastRequest {
+  uint32 location_id = 1;
+}
+message GetForecastResponse {
+  SourceMetadata metadata = 1;
+  repeated Forecast forecasts = 2;
+}
+// Source period codes: currently 1 (hour), 3 (three hours), 24 (daily).
+// Preserve unfamiliar codes. Times are UTC; coverage is determined by upstream.
+// Missing/null/empty/-99 measurements are absent; zero and negative temperatures survive.
+// source_json preserves original fields, including unrecognized additions.
+message Forecast {
+  uint32 location_id = 1;
+  google.protobuf.Timestamp forecast_at = 2;
+  optional int32 period_hours = 3;
+  optional double temperature_celsius = 4;
+  optional double minimum_temperature_celsius = 5;
+  optional double maximum_temperature_celsius = 6;
+  optional double relative_humidity_percent = 7;
+  optional double wind_speed_kilometers_per_hour = 8;
+  string wind_direction = 9;
+  optional int32 weather_type_code = 10;
+  // The website describes probability for >=0.3mm in the preceding three hours.
+  // Keep the source value; do not reinterpret it as a one-hour rain probability.
+  optional double precipitation_probability_percent = 11;
+  optional int32 precipitation_intensity_code = 12;
+  optional double uv_index = 13;
+  google.protobuf.Timestamp upstream_updated_at = 14;
+  optional double utci_celsius = 15;
+  optional double sea_temperature_celsius = 16;
+  optional double total_sea_height_meters = 17;
+  optional double swell_height_meters = 18;
+  optional double swell_period_seconds = 19;
+  optional double peak_period_seconds = 20;
+  string wave_direction = 21;
+  optional int32 wind_speed_class = 22;
+  string source_json = 23;
+}
+message GetLocationsRequest {}
+message GetLocationsResponse {
+  SourceMetadata metadata = 1;
+  repeated Location locations = 2;
+}
+message Location {
+  uint32 location_id = 1;
+  string name = 2;
+  optional double latitude = 3;
+  optional double longitude = 4;
+  optional uint32 region_id = 5;
+  optional uint32 district_id = 6;
+  optional uint32 municipality_local_id = 7;
+  string warning_area_id = 8;
+  string source_json = 9;
+}
+message GetDistrictsRequest {}
+message GetDistrictsResponse {
+  SourceMetadata metadata = 1;
+  repeated District districts = 2;
+}
+message District {
+  uint32 district_id = 1;
+  optional uint32 region_id = 2;
+  string name = 3;
+  string source_json = 4;
+}
+message GetWarningsRequest {}
+message GetWarningsResponse {
+  SourceMetadata metadata = 1;
+  repeated Warning warnings = 2;
+}
+message Warning {
+  string area_id = 1;
+  string type_name = 2;
+  string level = 3;
+  string text = 4;
+  google.protobuf.Timestamp starts_at = 5;
+  google.protobuf.Timestamp ends_at = 6;
+  google.protobuf.Timestamp reported_at = 7;
+  string source_json = 8;
+}

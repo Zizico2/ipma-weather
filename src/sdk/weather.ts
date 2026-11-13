@@ -16,6 +16,13 @@ export function createWeatherClient(
 ): WeatherLoader {
   const rpc = hc<WeatherApi>('/', options);
   return {
+    hourlyForecast: (id, signal) =>
+      call(
+        rpc.api['hourly-forecasts'][':id'].$get(
+          { param: { id: String(id) } },
+          { init: { signal } },
+        ),
+      ),
     locations: (signal) =>
       call(rpc.api.locations.$get(undefined, { init: { signal } })),
     forecast: (id, signal) =>

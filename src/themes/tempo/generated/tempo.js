@@ -223,7 +223,11 @@ export const tempoTheme = {
     "--tempo-weather-sky-color": "#f4e8ab",
     "--tempo-weather-orbits": "radial-gradient(circle at center, #f4e8ab18 0%, #f4e8ab08 48%, transparent 49%), radial-gradient(circle at center, transparent 65%, #c6d8bd26 66%, transparent 67%)",
     "--tempo-weather-icon-forecast": "2rem",
-    "--tempo-weather-icon-hero": "7rem"
+    "--tempo-weather-icon-hero": "7rem",
+    "--tempo-hour-width": "5.5rem",
+    "--tempo-hour-line": "light-dark(#a86d20, #e9bd68)",
+    "--tempo-hour-fill": "light-dark(#edc36b30, #edc36b18)",
+    "--tempo-hour-rain": "light-dark(#3c7188, #99cddd)"
   },
   __localTokenOwners: {
     "--astryx-theme-neutral-color-status-fill-accent": "neutral",
@@ -231,7 +235,11 @@ export const tempoTheme = {
     "--tempo-weather-sky-color": "tempo",
     "--tempo-weather-orbits": "tempo",
     "--tempo-weather-icon-forecast": "tempo",
-    "--tempo-weather-icon-hero": "tempo"
+    "--tempo-weather-icon-hero": "tempo",
+    "--tempo-hour-width": "tempo",
+    "--tempo-hour-line": "tempo",
+    "--tempo-hour-fill": "tempo",
+    "--tempo-hour-rain": "tempo"
   },
   __localTokenLineage: ["neutral","tempo"],
   components: {

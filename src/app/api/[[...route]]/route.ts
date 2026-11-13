@@ -1,5 +1,11 @@
 import { handle } from '@hono/vercel';
 import { createWeatherApi } from '../../../server/api';
-import { getForecast, getLocations } from '../../../server/weather';
+import {
+  getForecast,
+  getHourlyForecast,
+  getLocations,
+} from '../../../server/weather';
 
-export const GET = handle(createWeatherApi({ getForecast, getLocations }));
+export const GET = handle(
+  createWeatherApi({ getForecast, getHourlyForecast, getLocations }),
+);

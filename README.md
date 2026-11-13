@@ -1,7 +1,12 @@
 # Tempo · IPMA weather
 
 A small weather app for Portugal, in its own repository. Search IPMA locations,
-explore the five-day forecast, select a day, switch °C/°F, and refresh. Missing
+explore the five-day forecast, select a day, switch °C/°F, and refresh.
+The main daily card leads the page. Beneath it, a compact hourly timeline offers
+“Next 10 hours” and “Today”. Swipe or use the arrow keys to browse local times,
+weather icons, temperatures, the connected temperature trace and rain chances.
+Tap an hour to see its conditions, wind and humidity. Source timestamps and
+attribution are available in the expandable “Source & details” section. Missing
 measurements stay missing; daily maximums are labelled as forecasts, not current
 observations. All weather data comes from the backend.
 
@@ -22,6 +27,12 @@ variable. Its default is `http://127.0.0.1:50051`; set it to
 transport's normal certificate verification. There are no browser gRPC or CORS
 requirements. Do not prefix this variable with `NEXT_PUBLIC_`.
 
+For hourly weather, also run `ipma-public-data-proxy` on **50053** and
+`ipma-public-data-gateway` on **50054**. Set the server-only
+`IPMA_PUBLIC_DATA_GRPC_URL` (default `http://127.0.0.1:50054`) to that gateway,
+or `http://127.0.0.1:50053` to call its adapter directly. Daily weather still
+works when this backend is unavailable.
+
 `bun run build && bun start` runs the production app. The build contacts the
 backend to prerender Lisbon; keep the backend available during the build.
 Other cities stream into the shared static shell at request time.
@@ -31,8 +42,10 @@ a city's forecast arrives and its search text survives city navigation. The
 location catalogue crosses the RSC boundary as plain props; the forecast uses
 TanStack DB's native dehydration and hydration. Active-link styling is isolated
 behind its own Suspense boundary so reading the current URL does not delay the
-picker. The forecast remains one streaming section, since its metrics come
-from the same RPC.
+picker. Daily and hourly forecasts have independent streaming/cache boundaries. The
+hourly clock uses request time, with a minute timer after hydration, so cached
+data does not freeze the rolling window. Hourly failures leave daily weather
+available and a failed refresh retains the last hourly snapshot.
 
 City links prefetch the shared shell by default. Hovering or focusing a link
 opts that link into `prefetch={true}`, including its cached city forecast.
@@ -63,7 +76,8 @@ Hono /api → same cached backend loaders → gRPC
 
 Server Components call shared loaders directly, avoiding an HTTP request to
 their own Hono endpoint. Browser collection queries use the typed Hono client
-in `src/sdk`, which calls `/api/locations` and `/api/forecasts/:locationId`.
+in `src/sdk`, which calls `/api/locations`, `/api/forecasts/:locationId`,
+and `/api/hourly-forecasts/:locationId`.
 The API validates IDs and returns 400, 404 or a sanitized 503 as appropriate.
 
 The server allocates a fresh `DbClient` and `QueryClient` for each snapshot
@@ -89,6 +103,18 @@ Forecasts revalidate after 5 minutes and expire after 30 minutes. Next can serve
 stale data while revalidating; a refresh reads this shared cache, rather than
 forcing a new IPMA request. Locations revalidate daily and descriptions use the
 `days` profile. Source-update and retrieval timestamps are displayed separately.
+Hourly rows come exclusively from the independent **IPMA website feed**, through
+`ipma-public-data-gateway`; daily rows retain the documented open-data source.
+Only `period_hours == 1` rows for the requested city are displayed. “Next 10
+hours” is a clock window starting now, not a promise of ten available rows;
+“Today” includes all published hours in that city's local calendar day.
+Missing hours/temperatures are not interpolated, including on the curve.
+Azores cities use `Atlantic/Azores`; mainland and Madeira use `Europe/Lisbon`.
+Offsets are labelled to distinguish repeated DST hours. Rain probability retains
+the website's definition: ≥0.3 mm in the preceding **three** hours, including
+when attached to a one-hour forecast. Source update/retrieval times and website
+attribution are displayed separately from the daily source.
+
 Tags identify each city forecast and the location catalogue for future
 invalidation. No public cache invalidation endpoint is exposed.
 
@@ -98,22 +124,35 @@ or custom cache backend is required.
 
 ## Vercel deployment ownership
 
-Hosted deployment is owned by [ipma-infra](https://github.com/Zizico2/ipma-infra),
+Release deployment is owned by [ipma-infra](https://github.com/Zizico2/ipma-infra),
 including the pinned app revision, Vercel project selection, build artifact and
 manual approval workflow. This repository owns the standard Next.js build and
 Bun lockfile. Node.js 24 is selected through `engines.node`.
 
 Set the server-only `IPMA_GRPC_URL` in the Vercel project's Preview and Production
-environments to their HTTPS native gRPC gateway origins. Both build-time
+environments to their HTTPS native gRPC gateway origins. Also set
+`IPMA_PUBLIC_DATA_GRPC_URL` in each environment to its corresponding public-data
+gateway HTTPS origin before deploying this feature. Both build-time
 prerendering and runtime requests need access to that backend. Staging maps to
 Vercel Preview; production maps to Vercel Production. Vercel owns the framework
 cache; there are no KV bindings or Workers configuration files.
+
+The same Vercel project is connected to this GitHub repository for MR previews.
+Vercel builds branch pushes and posts the preview URL/status on the pull request.
+`vercel.json` disables automatic deployments from `main`; merging a PR therefore
+keeps production under the infra release workflow. Preview builds use the
+Preview gateway variables above and retain Vercel deployment protection and
+Git Fork Protection. No Vercel deployment token is needed in this repository's
+GitHub Actions, and the existing fixture-based CI continues independently. See
+[Vercel's GitHub preview guide](https://vercel.com/docs/git/vercel-for-github#preview-urls-for-the-latest-changes-for-each-pull-request)
+for the native deployment and MR notification behaviour.
 
 See [the deployment instructions](https://github.com/Zizico2/ipma-infra/blob/main/providers/vercel/README.md).
 
 ## Generate the client
 
-The complete schema snapshot is vendored from a pinned `ipma-proto` commit;
+Schema snapshots are vendored from pinned `ipma-proto` and
+`ipma-public-data-proto` commits;
 see [proto/README.md](proto/README.md). Generated TypeScript is checked in.
 Neither installation nor code generation needs a sibling checkout or a system
 `protoc` installation.
@@ -175,7 +214,11 @@ weather codes, API validation/errors, and DB hydration/request isolation.
 Playwright runs desktop and mobile Chromium against an actual generated-schema
 HTTP/2 gRPC fixture. It covers streamed server HTML with JS disabled, hydration,
 city navigation, units, day selection, refresh failure with retained data,
-empty/missing data, backend failure, and unknown locations. With JS disabled,
+empty/missing data, backend failure, and unknown locations. Hourly tests cover
+server HTML, both windows, shared units, hourly backend failure, refresh failure,
+independent daily availability, hero-first ordering, touch/keyboard panning,
+hour selection and narrow-screen overflow. Unit tests cover mixed periods, clock-window
+gaps, midnight, Azores dates and repeated DST hours. With JS disabled,
 late Suspense HTML is present but React's reveal script cannot run.
 
 Navigation tests use Next's `instant()` helper to hold back request-time data

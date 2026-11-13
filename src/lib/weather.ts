@@ -78,3 +78,55 @@ export function conditionKind(
   if (code >= 6 && code <= 15) return 'rain';
   return 'cloud';
 }
+
+export type HourlyForecast = Pick<
+  Forecast,
+  | 'id'
+  | 'locationId'
+  | 'weatherCode'
+  | 'condition'
+  | 'updatedAt'
+  | 'fetchedAt'
+  | 'sourceUrl'
+  | 'attribution'
+> & {
+  forecastAt: string;
+  temperature: number | null;
+  humidity: number | null;
+  windSpeed: number | null;
+  windDirection: string;
+  rainProbability: number | null;
+};
+
+export function locationTimeZone(locationId: number): string {
+  return String(locationId).startsWith('3')
+    ? 'Atlantic/Azores'
+    : 'Europe/Lisbon';
+}
+
+export function localDate(value: string | number, timeZone: string): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(value));
+}
+
+/** Next ten clock hours; gaps stay gaps. Today includes all published local-day hours. */
+export function selectHourlyForecasts(
+  forecasts: HourlyForecast[],
+  view: 'next' | 'today',
+  now: number,
+  timeZone: string,
+): HourlyForecast[] {
+  const today = localDate(now, timeZone);
+  return forecasts
+    .filter((row) => {
+      const at = Date.parse(row.forecastAt);
+      return view === 'today'
+        ? localDate(row.forecastAt, timeZone) === today
+        : at >= now && at < now + 10 * 60 * 60 * 1000;
+    })
+    .sort((a, b) => a.forecastAt.localeCompare(b.forecastAt));
+}

@@ -217,13 +217,20 @@ function HourlyOutlook({
                       <Text size="xl" weight="semibold" hasTabularNumbers>
                         {temperature(row.temperature, unit)}
                       </Text>
-                      <HourCurve
-                        row={row}
-                        previous={rows[index - 1]}
-                        next={rows[index + 1]}
-                        minimum={minimum}
-                        range={range}
-                      />
+                      <Stack
+                        width="100%"
+                        height={56}
+                        xstyle={styles.curveSlot}
+                        aria-hidden="true"
+                      >
+                        {index === 0 && (
+                          <TemperatureCurve
+                            rows={rows}
+                            minimum={minimum}
+                            range={range}
+                          />
+                        )}
+                      </Stack>
                       <Stack
                         direction="horizontal"
                         align="center"
@@ -342,66 +349,78 @@ function HourlyOutlook({
   );
 }
 
-// Each slice shares its neighbours' edge coordinates, making one continuous
-// temperature trace as the hours scroll. Missing hours/values break the trace.
-function HourCurve({
-  row,
-  previous,
-  next,
+// Paint the entire trace in one SVG. Separate SVGs produce antialiased seams
+// at fractional tile widths. Missing measurements or hours still break the path.
+function TemperatureCurve({
+  rows,
   minimum,
   range,
 }: {
-  row: HourlyForecast;
-  previous?: HourlyForecast;
-  next?: HourlyForecast;
+  rows: HourlyForecast[];
   minimum: number;
   range: number;
 }) {
-  const y = (value: number) => 48 - ((value - minimum) / range) * 32;
-  const connected = (other: HourlyForecast | undefined) =>
-    other?.temperature != null &&
-    Math.abs(Date.parse(other.forecastAt) - Date.parse(row.forecastAt)) ===
-      3_600_000;
-  const current = row.temperature === null ? null : y(row.temperature);
-  const left =
-    current !== null && connected(previous)
-      ? (y(previous!.temperature!) + current) / 2
-      : null;
-  const right =
-    current !== null && connected(next)
-      ? (y(next!.temperature!) + current) / 2
-      : null;
-  const start = left === null ? 50 : 0;
-  const end = right === null ? 50 : 100;
-  const path =
-    current === null
-      ? ''
-      : `${left === null ? `M50 ${current}` : `M0 ${left} C20 ${left} 30 ${current} 50 ${current}`} ${right === null ? '' : `C70 ${current} 80 ${right} 100 ${right}`}`;
+  const segments: { x: number; y: number; id: string }[][] = [];
+  for (const [index, row] of rows.entries()) {
+    if (row.temperature === null) continue;
+    const previous = rows[index - 1];
+    if (
+      !previous ||
+      previous.temperature === null ||
+      Date.parse(row.forecastAt) - Date.parse(previous.forecastAt) !== 3_600_000
+    ) {
+      segments.push([]);
+    }
+    segments[segments.length - 1].push({
+      x: index * 100 + 50,
+      y: 48 - ((row.temperature - minimum) / range) * 32,
+      id: row.id,
+    });
+  }
   return (
     <svg
-      viewBox="0 0 100 64"
+      viewBox={`0 0 ${rows.length * 100} 64`}
       preserveAspectRatio="none"
-      width="100%"
+      width={`${rows.length * 100}%`}
       height="56"
       aria-hidden="true"
       focusable="false"
       {...stylex.props(styles.curve)}
     >
-      {current !== null && (
-        <>
-          <path
-            d={`${path} L${end} 64 L${start} 64 Z`}
-            fill="var(--tempo-hour-fill)"
-          />
-          <path
-            d={path}
-            fill="none"
-            stroke="var(--tempo-hour-line)"
-            strokeWidth="2.5"
-          />
-          <circle cx="50" cy={current} r="3" fill="var(--tempo-hour-line)" />
-        </>
-      )}
+      {segments.map((points) => {
+        const first = points[0];
+        const last = points[points.length - 1];
+        const path = points
+          .map((point, index) =>
+            index === 0
+              ? `M${point.x} ${point.y}`
+              : `C${point.x - 70} ${points[index - 1].y} ${point.x - 30} ${point.y} ${point.x} ${point.y}`,
+          )
+          .join(' ');
+        return (
+          <g key={first.id}>
+            <path
+              d={`${path} L${last.x} 64 L${first.x} 64 Z`}
+              fill="var(--tempo-hour-fill)"
+            />
+            <path
+              d={path}
+              fill="none"
+              stroke="var(--tempo-hour-line)"
+              strokeWidth="2.5"
+            />
+            {points.map((point) => (
+              <circle
+                key={point.id}
+                cx={point.x}
+                cy={point.y}
+                r="3"
+                fill="var(--tempo-hour-line)"
+              />
+            ))}
+          </g>
+        );
+      })}
     </svg>
   );
 }
@@ -443,7 +462,14 @@ const styles = stylex.create({
   },
   weatherIcon: { color: 'var(--tempo-hour-line)' },
   rain: { color: 'var(--tempo-hour-rain)' },
-  curve: { display: 'block', flexShrink: 0 },
+  curveSlot: { position: 'relative', flexShrink: 0 },
+  curve: {
+    position: 'absolute',
+    insetInlineStart: 0,
+    top: 0,
+    zIndex: 1,
+    pointerEvents: 'none',
+  },
   details: {
     borderTopWidth: 1,
     borderTopStyle: 'solid',

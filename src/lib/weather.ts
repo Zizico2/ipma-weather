@@ -130,3 +130,21 @@ export function selectHourlyForecasts(
     })
     .sort((a, b) => a.forecastAt.localeCompare(b.forecastAt));
 }
+
+/** Use a published period-end value only for hours within its preceding three-hour window. */
+export function rainByHour(forecasts: HourlyForecast[]): HourlyForecast[] {
+  const published = new Map(
+    forecasts
+      .filter((row) => row.rainProbability !== null)
+      .map((row) => [Date.parse(row.forecastAt), row.rainProbability]),
+  );
+  return forecasts.map((row) => {
+    if (row.rainProbability !== null) return row;
+    const at = Date.parse(row.forecastAt);
+    const probability =
+      published.get(at + 3_600_000) ?? published.get(at + 7_200_000);
+    return probability === undefined
+      ? row
+      : { ...row, rainProbability: probability };
+  });
+}

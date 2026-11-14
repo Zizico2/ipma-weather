@@ -32,6 +32,7 @@ import {
   type HourlyForecast,
   localDate,
   locationTimeZone,
+  rainByHour,
   selectHourlyForecasts,
   temperature,
 } from '../lib/weather';
@@ -104,7 +105,12 @@ function HourlyOutlook({
     return () => clearInterval(timer);
   }, []);
   const timeZone = locationTimeZone(locationId);
-  const rows = selectHourlyForecasts(forecasts, view, now, timeZone);
+  const rows = selectHourlyForecasts(
+    rainByHour(forecasts),
+    view,
+    now,
+    timeZone,
+  );
   const selected = rows.find((row) => row.id === selectedId) ?? rows[0];
   const unavailable =
     status === 'error' ||
@@ -312,7 +318,7 @@ function HourlyOutlook({
       )}
       <Stack direction="horizontal" justify="between" align="center" gap={2}>
         <Text type="supporting" color="secondary">
-          Rain chance · preceding 3 hours
+          Rain chance · 3-hour periods
         </Text>
         <IconButton
           label="Refresh hourly"
@@ -334,8 +340,10 @@ function HourlyOutlook({
         }
       >
         <Text as="p" type="supporting" color="secondary">
-          Times in {timeZone}. Rain is the chance of ≥0.3 mm in the preceding 3
-          hours.
+          Times in {timeZone}. Rain probabilities describe ≥0.3 mm over a
+          three-hour period. The same published probability is shown for each
+          hour in that period; it is not a separate hourly probability. Values
+          are only filled when IPMA supplies the period endpoint.
           {meta?.updatedAt
             ? ` Source updated ${fullFormat.format(new Date(meta.updatedAt))}.`
             : ''}

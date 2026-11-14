@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   localDate,
   locationTimeZone,
+  rainByHour,
   selectHourlyForecasts,
 } from '../../src/lib/weather';
 import { GetForecastResponseSchema } from '../../src/server/gen/ipma/public_data/v1/public_data_pb';
@@ -131,4 +132,33 @@ describe('website-feed hourly boundary', () => {
       selectHourlyForecasts([], 'today', Date.now(), 'Europe/Lisbon'),
     ).toEqual([]);
   });
+});
+
+it('shares only the following period-end probability across its two preceding hours', () => {
+  const input = rows([
+    '2026-11-13T23:00:00Z',
+    '2026-11-14T00:00:00Z',
+    '2026-11-14T01:00:00Z',
+    '2026-11-14T02:00:00Z',
+    '2026-11-14T03:00:00Z',
+    '2026-11-14T04:00:00Z',
+    '2026-11-14T05:00:00Z',
+    '2026-11-14T06:00:00Z',
+    '2026-11-14T07:00:00Z',
+  ]);
+  input[1].rainProbability = 90;
+  input[4].rainProbability = 0;
+  input[7].rainProbability = 70;
+  expect(rainByHour(input).map((row) => row.rainProbability)).toEqual([
+    90,
+    90,
+    0,
+    0,
+    0,
+    70,
+    70,
+    70,
+    null,
+  ]);
+  expect(input[0].rainProbability).toBeNull();
 });

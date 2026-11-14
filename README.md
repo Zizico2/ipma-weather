@@ -244,3 +244,15 @@ to sample data. No live IPMA service or Rust build is required for the tests.
 - [Connect Node gRPC clients](https://connectrpc.com/docs/node/using-clients/)
 - [StyleX SWC integration](https://github.com/Dwlad90/stylex-swc-plugin)
 - [Astryx](https://github.com/meta/astryx)
+
+### Extra card selection
+
+The daily forecast uses `SelectableCardGroup` and `SelectableCardGroupItem` from
+`astryx-extra/SelectableCardGroup`, a commit-pinned Bun Git dependency on
+[Zizico2/astryx-extra](https://github.com/Zizico2/astryx-extra). All other app
+components use published `@astryxdesign/core` 0.7.13. The extra components reuse
+that installed Core for cards, fields, tokens and the existing internal card
+input bridge; verify compatibility before upgrading Core.
+
+Next.js transpiles the imported TypeScript source through the existing StyleX
+integration. No package lifecycle scripts or Astryx monorepo build are required.

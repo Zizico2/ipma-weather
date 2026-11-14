@@ -17,7 +17,6 @@ import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
-import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import { Stack, StackItem } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
@@ -27,6 +26,10 @@ import {
   useDbClient,
   useLiveQuery,
 } from '@tanstack/react-db';
+import {
+  SelectableCardGroup,
+  SelectableCardGroupItem,
+} from 'astryx-extra/SelectableCardGroup';
 import {
   ArrowDown,
   ArrowUp,
@@ -215,61 +218,68 @@ function WeatherDashboard({
                 {forecasts.length}-day forecast
               </Text>
             </Stack>
-            <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
-              {forecasts.map((day) => {
-                const isSelected = day.id === selected.id;
-                return (
-                  <SelectableCard
-                    key={day.id}
-                    width={200}
-                    height="100%"
-                    label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
-                    isSelected={isSelected}
-                    onChange={(next) => {
-                      if (next) setDate(day.date);
-                    }}
-                    variant={isSelected ? 'forecast-selected' : 'default'}
-                  >
-                    <Stack align="center" gap={3} width="100%">
-                      <Text type="label" justify="center" display="block">
-                        {dayLabel(day.date, 'long')}
-                      </Text>
-                      <WeatherIcon code={day.weatherCode} />
-                      <Text
-                        size="xl"
-                        justify="center"
-                        display="block"
-                        hasTabularNumbers
-                      >
-                        {temperature(day.maximum, unit)}{' '}
-                        <Text color="secondary">
-                          {temperature(day.minimum, unit)}
+            <SelectableCardGroup
+              label="Forecast day"
+              isLabelHidden
+              value={selected.date}
+              onChange={setDate}
+              isDisabled={!hydrated}
+            >
+              <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
+                {forecasts.map((day) => {
+                  const isSelected = day.id === selected.id;
+                  return (
+                    <SelectableCardGroupItem
+                      key={day.id}
+                      value={day.date}
+                      width={200}
+                      height="100%"
+                      label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
+                      variant={isSelected ? 'forecast-selected' : 'default'}
+                    >
+                      <Stack align="center" gap={3} width="100%">
+                        <Text type="label" justify="center" display="block">
+                          {dayLabel(day.date, 'long')}
                         </Text>
-                      </Text>
-                      <Text
-                        type="supporting"
-                        color="secondary"
-                        justify="center"
-                        display="block"
-                      >
-                        {day.condition}
-                      </Text>
-                      <Stack
-                        direction="horizontal"
-                        align="center"
-                        justify="center"
-                        gap={1}
-                      >
-                        <Icon icon={Droplets} size="sm" />
-                        <Text type="supporting">
-                          {day.rain === null ? '—' : `${Math.round(day.rain)}%`}
+                        <WeatherIcon code={day.weatherCode} />
+                        <Text
+                          size="xl"
+                          justify="center"
+                          display="block"
+                          hasTabularNumbers
+                        >
+                          {temperature(day.maximum, unit)}{' '}
+                          <Text color="secondary">
+                            {temperature(day.minimum, unit)}
+                          </Text>
                         </Text>
+                        <Text
+                          type="supporting"
+                          color="secondary"
+                          justify="center"
+                          display="block"
+                        >
+                          {day.condition}
+                        </Text>
+                        <Stack
+                          direction="horizontal"
+                          align="center"
+                          justify="center"
+                          gap={1}
+                        >
+                          <Icon icon={Droplets} size="sm" />
+                          <Text type="supporting">
+                            {day.rain === null
+                              ? '—'
+                              : `${Math.round(day.rain)}%`}
+                          </Text>
+                        </Stack>
                       </Stack>
-                    </Stack>
-                  </SelectableCard>
-                );
-              })}
-            </Carousel>
+                    </SelectableCardGroupItem>
+                  );
+                })}
+              </Carousel>
+            </SelectableCardGroup>
           </Stack>
 
           <Stack gap={5}>

@@ -15,6 +15,7 @@ import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { useSnapPaging } from '@astryxdesign/core/SnapPaging';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
+import { Tooltip } from '@astryxdesign/core/Tooltip';
 import * as stylex from '@stylexjs/stylex';
 import type { DehydratedDbState } from '@tanstack/db';
 import {
@@ -235,41 +236,41 @@ function HourlyOutlook({
                         </Stack>
                       </Stack>
                     </button>
-                    <Stack height={64} width="100%" xstyle={styles.curveSlot}>
+                    <Stack height={32} width="100%" xstyle={styles.curveSlot}>
                       {periods
                         .filter((period) => period.startIndex === index)
                         .map((period) => (
-                          <Stack
+                          <Tooltip
                             key={period.endsAt}
-                            width={`${period.length * 100}%`}
-                            height={64}
-                            gap={1}
-                            align="center"
-                            justify="center"
-                            aria-label={`Rain probability ${hourFormat.format(new Date(period.startsAt))}–${hourFormat.format(new Date(period.endsAt))}`}
-                            xstyle={[
-                              styles.rainTile,
-                              rows
-                                .slice(index, index + period.length)
-                                .some((hour) => hour.id === selected.id) &&
-                                styles.selectedHour,
-                            ]}
+                            content={`${hourFormat.format(new Date(period.startsAt))}–${hourFormat.format(new Date(period.endsAt))}`}
+                            hasHoverIndication={false}
                           >
                             <Stack
-                              direction="horizontal"
+                              width={`calc(${period.length * 100}% - var(--spacing-1))`}
+                              height={32}
                               align="center"
-                              gap={1}
+                              justify="center"
+                              aria-label={`Rain probability ${hourFormat.format(new Date(period.startsAt))}–${hourFormat.format(new Date(period.endsAt))}`}
+                              xstyle={[
+                                styles.rainTile,
+                                rows
+                                  .slice(index, index + period.length)
+                                  .some((hour) => hour.id === selected.id) &&
+                                  styles.selectedHour,
+                              ]}
                             >
-                              <Icon icon={Droplets} size="xsm" />
-                              <Text type="label">
-                                {Math.round(period.probability)}%
-                              </Text>
+                              <Stack
+                                direction="horizontal"
+                                align="center"
+                                gap={1}
+                              >
+                                <Icon icon={Droplets} size="xsm" />
+                                <Text type="label">
+                                  {Math.round(period.probability)}%
+                                </Text>
+                              </Stack>
                             </Stack>
-                            <Text type="supporting" color="secondary">
-                              {hourFormat.format(new Date(period.startsAt))}–
-                              {hourFormat.format(new Date(period.endsAt))}
-                            </Text>
-                          </Stack>
+                          </Tooltip>
                         ))}
                     </Stack>
                   </Stack>
@@ -363,9 +364,9 @@ function HourlyOutlook({
         <Text as="p" type="supporting" color="secondary">
           Times in {timeZone}. Rain probabilities describe ≥0.3 mm over a
           three-hour period. Each rain tile shows one probability for its
-          labelled interval. Selecting any hour covered by that tile highlights
-          the whole rain period. Partial periods at the edges keep their full
-          time label.
+          interval shown on hover or tap. Selecting any hour covered by that
+          tile highlights the whole rain period. Partial periods at the edges
+          keep their full time range in the tooltip.
           {meta?.updatedAt
             ? ` Source updated ${fullFormat.format(new Date(meta.updatedAt))}.`
             : ''}
@@ -471,7 +472,8 @@ const styles = stylex.create({
   },
   rainTile: {
     position: 'absolute',
-    insetInlineStart: 0,
+    zIndex: 1,
+    insetInlineStart: 'calc(var(--spacing-1) / 2)',
     top: 0,
     cursor: 'default',
     borderRadius: 'var(--radius-element)',

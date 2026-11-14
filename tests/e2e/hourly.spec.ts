@@ -224,6 +224,7 @@ test('compact hourly strip pans, selects an hour and exposes details on narrow s
 test('rain periods span three hours and follow selection without being interactive', async ({
   page,
   request,
+  isMobile,
 }) => {
   const response = await request.get('/api/hourly-forecasts/1110600');
   const rows = await response.json();
@@ -250,7 +251,17 @@ test('rain periods span three hours and follow selection without being interacti
   const hours = strip.locator('button[aria-pressed]');
   const hourBox = await hours.first().boundingBox();
   const rainBox = await period.boundingBox();
-  expect(Math.abs(rainBox!.width - hourBox!.width * 3)).toBeLessThan(1);
+  const gap = await period.evaluate(
+    (el) => parseFloat(getComputedStyle(el).insetInlineStart) * 2,
+  );
+  expect(Math.abs(rainBox!.width - (hourBox!.width * 3 - gap))).toBeLessThan(1);
+  expect(gap).toBeGreaterThan(0);
+  expect(rainBox!.height).toBe(32);
+  if (isMobile) await period.tap();
+  else await period.hover();
+  await expect(page.getByRole('tooltip')).toHaveText(/\d{2}:\d{2}–\d{2}:\d{2}/);
+  await page.mouse.move(0, 0);
+  await expect(period).toHaveText('40%');
   await expect(period).toHaveCSS('cursor', 'default');
   expect(await period.getAttribute('tabindex')).toBeNull();
   for (const index of [0, 1, 2]) {

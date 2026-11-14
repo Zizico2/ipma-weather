@@ -130,3 +130,45 @@ export function selectHourlyForecasts(
     })
     .sort((a, b) => a.forecastAt.localeCompare(b.forecastAt));
 }
+
+/** Group visible hourly tiles by their nearest published three-hour period endpoint. */
+export function rainPeriods(
+  forecasts: HourlyForecast[],
+  visible: HourlyForecast[],
+) {
+  const published = forecasts
+    .filter((row) => row.rainProbability !== null)
+    .sort((a, b) => a.forecastAt.localeCompare(b.forecastAt));
+  const groups: {
+    startIndex: number;
+    length: number;
+    probability: number;
+    endsAt: string;
+    startsAt: string;
+  }[] = [];
+  visible.forEach((row, index) => {
+    const at = Date.parse(row.forecastAt);
+    const endpoint = published.find((source) => {
+      const delta = Date.parse(source.forecastAt) - at;
+      return delta >= 0 && delta < 3_600_000 * 3;
+    });
+    if (!endpoint) return;
+    const last = groups[groups.length - 1];
+    if (
+      last?.endsAt === endpoint.forecastAt &&
+      last.startIndex + last.length === index
+    )
+      last.length++;
+    else
+      groups.push({
+        startIndex: index,
+        length: 1,
+        probability: endpoint.rainProbability!,
+        endsAt: endpoint.forecastAt,
+        startsAt: new Date(
+          Date.parse(endpoint.forecastAt) - 3 * 3_600_000,
+        ).toISOString(),
+      });
+  });
+  return groups;
+}

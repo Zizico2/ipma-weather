@@ -220,3 +220,60 @@ test('compact hourly strip pans, selects an hour and exposes details on narrow s
     ).toBe(true);
   }
 });
+
+test('rain periods span three hours and follow selection without being interactive', async ({
+  page,
+  request,
+  isMobile,
+}) => {
+  const response = await request.get('/api/hourly-forecasts/1110600');
+  const rows = await response.json();
+  await page.goto('/weather/1110600');
+  await page.route('**/api/hourly-forecasts/1110600', (route) =>
+    route.fulfill({
+      status: 200,
+      json: rows.map((row: object, index: number) => ({
+        ...row,
+        rainProbability: index === 2 ? 40 : null,
+      })),
+    }),
+  );
+  await page
+    .getByRole('button', { name: 'Refresh hourly', exact: true })
+    .click();
+  const strip = page.getByRole('region', {
+    name: 'Hourly forecasts',
+    exact: true,
+  });
+  const period = strip.getByLabel(/^Rain probability/);
+  await expect(period).toHaveCount(1);
+  await expect(period.getByText('40%')).toBeVisible();
+  const hours = strip.locator('button[aria-pressed]');
+  const hourBox = await hours.first().boundingBox();
+  const rainBox = await period.boundingBox();
+  const gap = await period.evaluate(
+    (el) => parseFloat(getComputedStyle(el).insetInlineStart) * 2,
+  );
+  expect(Math.abs(rainBox!.width - (hourBox!.width * 3 - gap))).toBeLessThan(1);
+  expect(gap).toBeGreaterThan(0);
+  expect(rainBox!.height).toBe(32);
+  if (isMobile) await period.tap();
+  else await period.hover();
+  await expect(page.getByRole('tooltip')).toHaveText(/\d{2}:\d{2}–\d{2}:\d{2}/);
+  await page.mouse.move(0, 0);
+  await expect(period).toHaveText('40%');
+  await expect(period).toHaveCSS('cursor', 'default');
+  expect(await period.getAttribute('tabindex')).toBeNull();
+  for (const index of [0, 1, 2]) {
+    await hours.nth(index).click();
+    const green = await hours
+      .nth(index)
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    await expect(period).toHaveCSS('background-color', green);
+  }
+  const green = await period.evaluate(
+    (el) => getComputedStyle(el).backgroundColor,
+  );
+  await hours.nth(3).click();
+  await expect(period).not.toHaveCSS('background-color', green);
+});

@@ -15,6 +15,7 @@ import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { useSnapPaging } from '@astryxdesign/core/SnapPaging';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
+import { Tooltip } from '@astryxdesign/core/Tooltip';
 import * as stylex from '@stylexjs/stylex';
 import type { DehydratedDbState } from '@tanstack/db';
 import {
@@ -32,6 +33,7 @@ import {
   type HourlyForecast,
   localDate,
   locationTimeZone,
+  rainPeriods,
   selectHourlyForecasts,
   temperature,
 } from '../lib/weather';
@@ -105,6 +107,7 @@ function HourlyOutlook({
   }, []);
   const timeZone = locationTimeZone(locationId);
   const rows = selectHourlyForecasts(forecasts, view, now, timeZone);
+  const periods = rainPeriods(forecasts, rows);
   const selected = rows.find((row) => row.id === selectedId) ?? rows[0];
   const unavailable =
     status === 'error' ||
@@ -192,60 +195,85 @@ function HourlyOutlook({
                 const dayLabel =
                   day === localDate(now, timeZone) ? 'Today' : 'Tomorrow';
                 return (
-                  <button
-                    key={row.id}
-                    type="button"
-                    {...stylex.props(
-                      styles.hour,
-                      row.id === selected.id && styles.selectedHour,
-                    )}
-                    aria-label={`${fullFormat.format(date)}, ${row.condition}, ${temperature(row.temperature, unit)}${unit}`}
-                    aria-pressed={row.id === selected.id}
-                    disabled={!hydrated}
-                    onClick={() => setSelectedId(row.id)}
-                  >
-                    <Stack gap={2} align="center" paddingBlock={3}>
-                      <Text type="supporting" color="secondary">
-                        {day !== previousDay ? dayLabel : ' '}
-                      </Text>
-                      <Text type="label" hasTabularNumbers>
-                        {hourFormat.format(date)}
-                      </Text>
-                      <Stack xstyle={styles.weatherIcon}>
-                        <WeatherIcon code={row.weatherCode} />
-                      </Stack>
-                      <Text size="xl" weight="semibold" hasTabularNumbers>
-                        {temperature(row.temperature, unit)}
-                      </Text>
-                      <Stack
-                        width="100%"
-                        height={56}
-                        xstyle={styles.curveSlot}
-                        aria-hidden="true"
-                      >
-                        {index === 0 && (
-                          <TemperatureCurve
-                            rows={rows}
-                            minimum={minimum}
-                            range={range}
-                          />
-                        )}
-                      </Stack>
-                      <Stack
-                        direction="horizontal"
-                        align="center"
-                        gap={1}
-                        xstyle={styles.rain}
-                      >
-                        <Icon icon={Droplets} size="xsm" />
-                        <Text type="supporting" hasTabularNumbers>
-                          {row.rainProbability === null
-                            ? '—'
-                            : `${Math.round(row.rainProbability)}%`}
+                  <Stack key={row.id} gap={1} xstyle={styles.column}>
+                    <button
+                      type="button"
+                      {...stylex.props(
+                        styles.hour,
+                        row.id === selected.id && styles.selectedHour,
+                      )}
+                      aria-label={`${fullFormat.format(date)}, ${row.condition}, ${temperature(row.temperature, unit)}${unit}`}
+                      aria-pressed={row.id === selected.id}
+                      disabled={!hydrated}
+                      onClick={() => setSelectedId(row.id)}
+                    >
+                      <Stack gap={2} align="center" paddingBlock={3}>
+                        <Text type="supporting" color="secondary">
+                          {day !== previousDay ? dayLabel : ' '}
                         </Text>
+                        <Text type="label" hasTabularNumbers>
+                          {hourFormat.format(date)}
+                        </Text>
+                        <Stack xstyle={styles.weatherIcon}>
+                          <WeatherIcon code={row.weatherCode} />
+                        </Stack>
+                        <Text size="xl" weight="semibold" hasTabularNumbers>
+                          {temperature(row.temperature, unit)}
+                        </Text>
+                        <Stack
+                          width="100%"
+                          height={56}
+                          xstyle={styles.curveSlot}
+                          aria-hidden="true"
+                        >
+                          {index === 0 && (
+                            <TemperatureCurve
+                              rows={rows}
+                              minimum={minimum}
+                              range={range}
+                            />
+                          )}
+                        </Stack>
                       </Stack>
+                    </button>
+                    <Stack height={32} width="100%" xstyle={styles.curveSlot}>
+                      {periods
+                        .filter((period) => period.startIndex === index)
+                        .map((period) => (
+                          <Tooltip
+                            key={period.endsAt}
+                            content={`${hourFormat.format(new Date(period.startsAt))}–${hourFormat.format(new Date(period.endsAt))}`}
+                            hasHoverIndication={false}
+                          >
+                            <Stack
+                              width={`calc(${period.length * 100}% - var(--spacing-1))`}
+                              height={32}
+                              align="center"
+                              justify="center"
+                              aria-label={`Rain probability ${hourFormat.format(new Date(period.startsAt))}–${hourFormat.format(new Date(period.endsAt))}`}
+                              xstyle={[
+                                styles.rainTile,
+                                rows
+                                  .slice(index, index + period.length)
+                                  .some((hour) => hour.id === selected.id) &&
+                                  styles.selectedHour,
+                              ]}
+                            >
+                              <Stack
+                                direction="horizontal"
+                                align="center"
+                                gap={1}
+                              >
+                                <Icon icon={Droplets} size="xsm" />
+                                <Text type="label">
+                                  {Math.round(period.probability)}%
+                                </Text>
+                              </Stack>
+                            </Stack>
+                          </Tooltip>
+                        ))}
                     </Stack>
-                  </button>
+                  </Stack>
                 );
               })}
             </Carousel>
@@ -312,7 +340,7 @@ function HourlyOutlook({
       )}
       <Stack direction="horizontal" justify="between" align="center" gap={2}>
         <Text type="supporting" color="secondary">
-          Rain chance · preceding 3 hours
+          Rain chance · 3-hour periods
         </Text>
         <IconButton
           label="Refresh hourly"
@@ -334,8 +362,11 @@ function HourlyOutlook({
         }
       >
         <Text as="p" type="supporting" color="secondary">
-          Times in {timeZone}. Rain is the chance of ≥0.3 mm in the preceding 3
-          hours.
+          Times in {timeZone}. Rain probabilities describe ≥0.3 mm over a
+          three-hour period. Each rain tile shows one probability for its
+          interval shown on hover or tap. Selecting any hour covered by that
+          tile highlights the whole rain period. Partial periods at the edges
+          keep their full time range in the tooltip.
           {meta?.updatedAt
             ? ` Source updated ${fullFormat.format(new Date(meta.updatedAt))}.`
             : ''}
@@ -435,9 +466,22 @@ const styles = stylex.create({
     borderColor: 'var(--color-border)',
     overflow: 'hidden',
   },
-  hour: {
+  column: {
     width:
       'max(var(--tempo-hour-width), calc((100cqi - 2 * var(--spacing-1)) / 10))',
+  },
+  rainTile: {
+    position: 'absolute',
+    zIndex: 1,
+    insetInlineStart: 'calc(var(--spacing-1) / 2)',
+    top: 0,
+    cursor: 'default',
+    borderRadius: 'var(--radius-element)',
+    backgroundColor: 'var(--color-background-muted)',
+    color: 'var(--tempo-hour-rain)',
+  },
+  hour: {
+    width: '100%',
     flexShrink: 0,
     padding: 0,
     appearance: 'none',

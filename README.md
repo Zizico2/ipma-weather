@@ -111,9 +111,13 @@ hours” is a clock window starting now, not a promise of ten available rows;
 Missing hours/temperatures are not interpolated, including on the curve.
 Azores cities use `Atlantic/Azores`; mainland and Madeira use `Europe/Lisbon`.
 Offsets are labelled to distinguish repeated DST hours. Rain probability retains
-the website's definition: ≥0.3 mm in the preceding **three** hours, including
-when attached to a one-hour forecast. Source update/retrieval times and website
-attribution are displayed separately from the daily source.
+the website's definition: ≥0.3 mm in the preceding **three** hours. Each published
+period probability appears once in a non-interactive tile spanning its covered
+hourly columns. Compact rain tiles have a gap between periods, with time ranges
+shown on hover or tap. Selecting any covered hour highlights that rain tile.
+Partial periods at the view edges retain their full interval in the tooltip.
+Source update/retrieval times and website attribution are displayed separately
+from the daily source.
 
 Tags identify each city forecast and the location catalogue for future
 invalidation. No public cache invalidation endpoint is exposed.

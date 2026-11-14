@@ -27,6 +27,10 @@ import {
   useLiveQuery,
 } from '@tanstack/react-db';
 import {
+  SelectableCardGroup,
+  SelectableCardGroupItem,
+} from 'astryx-fork/git/SelectableCardGroup';
+import {
   ArrowDown,
   ArrowUp,
   CloudSun,
@@ -35,7 +39,7 @@ import {
   RefreshCw,
   Wind,
 } from 'lucide-react';
-import { type ReactNode, useEffect, useId, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { forecastCollection, forecastQuery } from '../lib/collections';
 import { dayLabel, temperature, type WeatherLocation } from '../lib/weather';
 import { TemperatureUnitContext } from './temperature-unit';
@@ -65,7 +69,6 @@ function WeatherDashboard({
   hourly: ReactNode;
 }) {
   const db = useDbClient();
-  const dayGroupName = useId();
   const [descriptor] = useState(() => forecastCollection(location.id));
   const { data: forecasts } = useLiveQuery({
     query: forecastQuery(location.id),
@@ -215,28 +218,25 @@ function WeatherDashboard({
                 {forecasts.length}-day forecast
               </Text>
             </Stack>
-            <Stack role="radiogroup" aria-label="Forecast day">
+            <SelectableCardGroup
+              label="Forecast day"
+              isLabelHidden
+              value={selected.date}
+              onChange={setDate}
+              isDisabled={!hydrated}
+            >
               <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
                 {forecasts.map((day) => {
                   const isSelected = day.id === selected.id;
                   return (
-                    <Card
+                    <SelectableCardGroupItem
                       key={day.id}
+                      value={day.date}
                       width={200}
                       height="100%"
-                      xstyle={styles.dayCard}
+                      label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
                       variant={isSelected ? 'forecast-selected' : 'default'}
                     >
-                      <input
-                        type="radio"
-                        name={dayGroupName}
-                        value={day.date}
-                        checked={isSelected}
-                        disabled={!hydrated}
-                        aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
-                        onChange={() => setDate(day.date)}
-                        {...stylex.props(styles.dayRadio)}
-                      />
                       <Stack align="center" gap={3} width="100%">
                         <Text type="label" justify="center" display="block">
                           {dayLabel(day.date, 'long')}
@@ -275,11 +275,11 @@ function WeatherDashboard({
                           </Text>
                         </Stack>
                       </Stack>
-                    </Card>
+                    </SelectableCardGroupItem>
                   );
                 })}
               </Carousel>
-            </Stack>
+            </SelectableCardGroup>
           </Stack>
 
           <Stack gap={5}>
@@ -369,25 +369,6 @@ function formatTime(value: string) {
 // Brand-specific artwork; layout, sizing, scrolling, and interaction belong
 // to Astryx. Component overrides and shared colors live in tempoTheme.ts.
 const styles = stylex.create({
-  dayCard: {
-    position: 'relative',
-    ':has(:focus-visible)': {
-      outlineStyle: 'solid',
-      outlineWidth: 2,
-      outlineColor: 'var(--focus-outline-color)',
-      outlineOffset: 'calc(-1 * var(--spacing-1))',
-    },
-  },
-  dayRadio: {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    margin: 0,
-    opacity: 0,
-    cursor: 'pointer',
-    zIndex: 1,
-  },
   hero: {
     backgroundImage: 'var(--tempo-weather-glow)',
   },

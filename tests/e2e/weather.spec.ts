@@ -35,7 +35,7 @@ test('hydrates, changes units and days, searches and navigates cities', async ({
   await expect(forecast.getByText('72°F', { exact: true })).toBeVisible();
   await page
     .getByRole('region', { name: 'Daily forecasts' })
-    .getByRole('radio', { name: /^Thursday 12 Nov,/ })
+    .getByText('Thursday 12 Nov', { exact: true })
     .click();
   await expect(forecast.getByText('73°F', { exact: true })).toBeVisible();
   await (await locationSearch(page)).fill('porto');
@@ -263,9 +263,9 @@ test('daily forecasts provide a single radio choice with native keyboard navigat
   await page.keyboard.press('Tab');
   await expect(days.first()).not.toBeFocused();
   await expect(days.nth(1)).not.toBeFocused();
-  await days.nth(2).click();
+  await group.getByText('Friday 13 Nov', { exact: true }).click();
   await expect(days.nth(2)).toBeChecked();
-  await days.nth(2).click();
+  await group.getByText('Friday 13 Nov', { exact: true }).click();
   await expect(days.nth(2)).toBeChecked();
   await expect(group.locator('input:checked')).toHaveCount(1);
 });

@@ -29,7 +29,7 @@ import {
 import {
   SelectableCardGroup,
   SelectableCardGroupItem,
-} from 'astryx-fork/git/SelectableCardGroup';
+} from 'astryx-extra/SelectableCardGroup';
 import {
   ArrowDown,
   ArrowUp,

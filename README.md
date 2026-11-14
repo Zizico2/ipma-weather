@@ -245,15 +245,14 @@ to sample data. No live IPMA service or Rust build is required for the tests.
 - [StyleX SWC integration](https://github.com/Dwlad90/stylex-swc-plugin)
 - [Astryx](https://github.com/meta/astryx)
 
-### Forked card selection
+### Extra card selection
 
 The daily forecast uses `SelectableCardGroup` and `SelectableCardGroupItem` from
-`astryx-fork/git/SelectableCardGroup`, a commit-pinned Bun Git dependency on
-[Zizico2/astryx](https://github.com/Zizico2/astryx). Every other app component
-continues to import published `@astryxdesign/core` 0.7.13. The fork's generated
-Git entry reuses that installed Core for cards, fields, tokens and its existing
-internal card input bridge; verify compatibility before upgrading Core.
+`astryx-extra/SelectableCardGroup`, a commit-pinned Bun Git dependency on
+[Zizico2/astryx-extra](https://github.com/Zizico2/astryx-extra). All other app
+components use published `@astryxdesign/core` 0.7.13. The extra components reuse
+that installed Core for cards, fields, tokens and the existing internal card
+input bridge; verify compatibility before upgrading Core.
 
-Next.js transpiles only the fork's imported source through the existing StyleX
-integration. No fork lifecycle scripts or monorepo build are required. Do not add
-the fork to `trustedDependencies`; its repository tooling is not part of the app.
+Next.js transpiles the imported TypeScript source through the existing StyleX
+integration. No package lifecycle scripts or Astryx monorepo build are required.

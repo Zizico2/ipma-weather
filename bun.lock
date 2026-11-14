@@ -16,7 +16,7 @@
         "@tanstack/query-core": "5.107.1",
         "@tanstack/query-db-collection": "1.5.1",
         "@tanstack/react-db": "1.0.0-rc.1.4",
-        "astryx-fork": "github:Zizico2/astryx#9e6be416b8c829080c95b4351f924a0cdf54d829",
+        "astryx-extra": "github:Zizico2/astryx-extra#4ec4e4b964d0f859c4ac5b7826a301078a1f2cf7",
         "hono": "4.13.17",
         "lucide-react": "1.71.0",
         "next": "16.4.6",
@@ -562,7 +562,7 @@
 
     "ast-types": ["ast-types@0.16.3", "", { "dependencies": { "tslib": "^2.0.1" } }, "sha512-FvWoWYfSCM6kRxCSH+MGLHIKKGRL6A6AW7Zek2O32REPQRdg131428uRTKMBYAeRd3XXAaHDS60Wpri7CdKDrA=="],
 
-    "astryx-fork": ["astryx@github:Zizico2/astryx#9e6be41", { "hasInstallScript": true }, "Zizico2-astryx-9e6be41", "sha512-xkx1yNo/8TRNMYZIVV3rPUrYWlBAUdtWmrRA6HKiV6zL0NU9EX5MSNXdFBdOG6POiIn0QKxsyLQozzIcK5gsUw=="],
+    "astryx-extra": ["astryx-extra@github:Zizico2/astryx-extra#4ec4e4b", { "peerDependencies": { "@astryxdesign/core": "0.7.13", "@stylexjs/stylex": "^0.19.1", "react": "^19.3.1", "react-dom": "^19.3.1" } }, "Zizico2-astryx-extra-4ec4e4b", "sha512-BDbIjIydkMgo5LxBgHHct1bTMCRCk1qOVzNcOTKpOJPI7GoN1WfUzLbKpi3SXhABOtdH1RzxtrJIXLe6kpwvnQ=="],
 
     "babel-plugin-react-compiler": ["babel-plugin-react-compiler@1.0.0", "", { "dependencies": { "@babel/types": "^7.26.0" } }, "sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw=="],
 

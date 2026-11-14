@@ -4,7 +4,7 @@ import type { NextConfig } from 'next';
 const config: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
   reactCompiler: true,
-  transpilePackages: ['astryx-fork'],
+  transpilePackages: ['astryx-extra'],
   cacheComponents: true,
   partialPrefetching: true,
   typedRoutes: true,

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   localDate,
   locationTimeZone,
-  rainByHour,
+  rainPeriods,
   selectHourlyForecasts,
 } from '../../src/lib/weather';
 import { GetForecastResponseSchema } from '../../src/server/gen/ipma/public_data/v1/public_data_pb';
@@ -134,31 +134,31 @@ describe('website-feed hourly boundary', () => {
   });
 });
 
-it('shares only the following period-end probability across its two preceding hours', () => {
+it('groups visible hours into published rain periods without copying probabilities', () => {
   const input = rows([
-    '2026-11-13T23:00:00Z',
-    '2026-11-14T00:00:00Z',
     '2026-11-14T01:00:00Z',
     '2026-11-14T02:00:00Z',
     '2026-11-14T03:00:00Z',
     '2026-11-14T04:00:00Z',
-    '2026-11-14T05:00:00Z',
-    '2026-11-14T06:00:00Z',
-    '2026-11-14T07:00:00Z',
   ]);
-  input[1].rainProbability = 90;
-  input[4].rainProbability = 0;
-  input[7].rainProbability = 70;
-  expect(rainByHour(input).map((row) => row.rainProbability)).toEqual([
-    90,
-    90,
-    0,
-    0,
-    0,
-    70,
-    70,
-    70,
-    null,
+  input[2].rainProbability = 0;
+  expect(rainPeriods(input, input)).toEqual([
+    {
+      startIndex: 0,
+      length: 3,
+      probability: 0,
+      endsAt: input[2].forecastAt,
+      startsAt: '2026-11-14T00:00:00.000Z',
+    },
   ]);
   expect(input[0].rainProbability).toBeNull();
+  expect(rainPeriods(input, input.slice(1))).toEqual([
+    {
+      startIndex: 0,
+      length: 2,
+      probability: 0,
+      endsAt: input[2].forecastAt,
+      startsAt: '2026-11-14T00:00:00.000Z',
+    },
+  ]);
 });

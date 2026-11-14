@@ -17,7 +17,6 @@ import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
-import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import { Stack, StackItem } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
@@ -36,7 +35,7 @@ import {
   RefreshCw,
   Wind,
 } from 'lucide-react';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useId, useState } from 'react';
 import { forecastCollection, forecastQuery } from '../lib/collections';
 import { dayLabel, temperature, type WeatherLocation } from '../lib/weather';
 import { TemperatureUnitContext } from './temperature-unit';
@@ -66,6 +65,7 @@ function WeatherDashboard({
   hourly: ReactNode;
 }) {
   const db = useDbClient();
+  const dayGroupName = useId();
   const [descriptor] = useState(() => forecastCollection(location.id));
   const { data: forecasts } = useLiveQuery({
     query: forecastQuery(location.id),
@@ -215,61 +215,71 @@ function WeatherDashboard({
                 {forecasts.length}-day forecast
               </Text>
             </Stack>
-            <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
-              {forecasts.map((day) => {
-                const isSelected = day.id === selected.id;
-                return (
-                  <SelectableCard
-                    key={day.id}
-                    width={200}
-                    height="100%"
-                    label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
-                    isSelected={isSelected}
-                    onChange={(next) => {
-                      if (next) setDate(day.date);
-                    }}
-                    variant={isSelected ? 'forecast-selected' : 'default'}
-                  >
-                    <Stack align="center" gap={3} width="100%">
-                      <Text type="label" justify="center" display="block">
-                        {dayLabel(day.date, 'long')}
-                      </Text>
-                      <WeatherIcon code={day.weatherCode} />
-                      <Text
-                        size="xl"
-                        justify="center"
-                        display="block"
-                        hasTabularNumbers
-                      >
-                        {temperature(day.maximum, unit)}{' '}
-                        <Text color="secondary">
-                          {temperature(day.minimum, unit)}
+            <Stack role="radiogroup" aria-label="Forecast day">
+              <Carousel aria-label="Daily forecasts" gap={3} hasSnap>
+                {forecasts.map((day) => {
+                  const isSelected = day.id === selected.id;
+                  return (
+                    <Card
+                      key={day.id}
+                      width={200}
+                      height="100%"
+                      xstyle={styles.dayCard}
+                      variant={isSelected ? 'forecast-selected' : 'default'}
+                    >
+                      <input
+                        type="radio"
+                        name={dayGroupName}
+                        value={day.date}
+                        checked={isSelected}
+                        disabled={!hydrated}
+                        aria-label={`${dayLabel(day.date, 'long')}, ${day.condition}`}
+                        onChange={() => setDate(day.date)}
+                        {...stylex.props(styles.dayRadio)}
+                      />
+                      <Stack align="center" gap={3} width="100%">
+                        <Text type="label" justify="center" display="block">
+                          {dayLabel(day.date, 'long')}
                         </Text>
-                      </Text>
-                      <Text
-                        type="supporting"
-                        color="secondary"
-                        justify="center"
-                        display="block"
-                      >
-                        {day.condition}
-                      </Text>
-                      <Stack
-                        direction="horizontal"
-                        align="center"
-                        justify="center"
-                        gap={1}
-                      >
-                        <Icon icon={Droplets} size="sm" />
-                        <Text type="supporting">
-                          {day.rain === null ? '—' : `${Math.round(day.rain)}%`}
+                        <WeatherIcon code={day.weatherCode} />
+                        <Text
+                          size="xl"
+                          justify="center"
+                          display="block"
+                          hasTabularNumbers
+                        >
+                          {temperature(day.maximum, unit)}{' '}
+                          <Text color="secondary">
+                            {temperature(day.minimum, unit)}
+                          </Text>
                         </Text>
+                        <Text
+                          type="supporting"
+                          color="secondary"
+                          justify="center"
+                          display="block"
+                        >
+                          {day.condition}
+                        </Text>
+                        <Stack
+                          direction="horizontal"
+                          align="center"
+                          justify="center"
+                          gap={1}
+                        >
+                          <Icon icon={Droplets} size="sm" />
+                          <Text type="supporting">
+                            {day.rain === null
+                              ? '—'
+                              : `${Math.round(day.rain)}%`}
+                          </Text>
+                        </Stack>
                       </Stack>
-                    </Stack>
-                  </SelectableCard>
-                );
-              })}
-            </Carousel>
+                    </Card>
+                  );
+                })}
+              </Carousel>
+            </Stack>
           </Stack>
 
           <Stack gap={5}>
@@ -359,6 +369,25 @@ function formatTime(value: string) {
 // Brand-specific artwork; layout, sizing, scrolling, and interaction belong
 // to Astryx. Component overrides and shared colors live in tempoTheme.ts.
 const styles = stylex.create({
+  dayCard: {
+    position: 'relative',
+    ':has(:focus-visible)': {
+      outlineStyle: 'solid',
+      outlineWidth: 2,
+      outlineColor: 'var(--focus-outline-color)',
+      outlineOffset: 'calc(-1 * var(--spacing-1))',
+    },
+  },
+  dayRadio: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    margin: 0,
+    opacity: 0,
+    cursor: 'pointer',
+    zIndex: 1,
+  },
   hero: {
     backgroundImage: 'var(--tempo-weather-glow)',
   },

@@ -35,7 +35,7 @@ test('hydrates, changes units and days, searches and navigates cities', async ({
   await expect(forecast.getByText('72°F', { exact: true })).toBeVisible();
   await page
     .getByRole('region', { name: 'Daily forecasts' })
-    .getByText('Thursday 12 Nov', { exact: true })
+    .getByRole('radio', { name: /^Thursday 12 Nov,/ })
     .click();
   await expect(forecast.getByText('73°F', { exact: true })).toBeVisible();
   await (await locationSearch(page)).fill('porto');
@@ -229,4 +229,43 @@ test('handles backend failure and unknown locations', async ({
   await page.getByRole('link', { name: 'Back to your forecast →' }).click();
   await expect(page).toHaveURL(/\/weather\/1131200$/);
   await expect(page.getByRole('heading', { name: 'Porto,' })).toBeVisible();
+});
+
+test('daily forecasts provide a single radio choice with native keyboard navigation', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const group = page.getByRole('radiogroup', {
+    name: 'Forecast day',
+    exact: true,
+  });
+  const days = group.getByRole('radio');
+  await expect(days).toHaveCount(5);
+  await expect(group.getByRole('checkbox')).toHaveCount(0);
+  await expect(days.first()).toBeChecked();
+  await days.first().focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(days.nth(1)).toBeFocused();
+  await expect(days.nth(1)).toBeChecked();
+  await expect(group.locator('input:checked')).toHaveCount(1);
+  await expect(
+    page
+      .getByRole('region', { name: 'Daily weather outlook' })
+      .getByText('23°C', { exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(days.nth(1)).toBeChecked();
+  await page.keyboard.press('ArrowLeft');
+  await expect(days.first()).toBeChecked();
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Tab');
+  await expect(days.first()).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(days.first()).not.toBeFocused();
+  await expect(days.nth(1)).not.toBeFocused();
+  await days.nth(2).click();
+  await expect(days.nth(2)).toBeChecked();
+  await days.nth(2).click();
+  await expect(days.nth(2)).toBeChecked();
+  await expect(group.locator('input:checked')).toHaveCount(1);
 });
